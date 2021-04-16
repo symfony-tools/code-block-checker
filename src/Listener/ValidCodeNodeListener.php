@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace SymfonyCodeBlockChecker\Listener;
 
 use Doctrine\RST\ErrorManager;
+use Doctrine\RST\Event\PostNodeCreateEvent;
+use Doctrine\RST\Event\PostParseDocumentEvent;
 use Doctrine\RST\Event\PreNodeRenderEvent;
 use Doctrine\RST\Nodes\CodeNode;
 use Symfony\Component\Process\Process;
@@ -30,7 +32,7 @@ class ValidCodeNodeListener
         $this->errorManager = $errorManager;
     }
 
-    public function preNodeRender(PreNodeRenderEvent $event)
+    public function postNodeCreate(PostNodeCreateEvent $event)
     {
         $node = $event->getNode();
         if (!$node instanceof CodeNode) {

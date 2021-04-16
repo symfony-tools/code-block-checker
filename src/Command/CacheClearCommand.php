@@ -13,7 +13,6 @@ class CacheClearCommand extends Command
 {
     protected static $defaultName = 'cache:clear';
 
-    private $repository;
     /**
      * @var string
      */

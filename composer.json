@@ -6,12 +6,19 @@
         "php": ">=8.0",
         "ext-ctype": "*",
         "ext-iconv": "*",
+        "doctrine/rst-parser": "0.4.x-dev",
         "symfony/console": "^5.2",
+        "symfony/docs-builder": "^0.15.0",
         "symfony/dotenv": "^5.2",
         "symfony/event-dispatcher": "^5.2",
         "symfony/flex": "^1.3.1",
         "symfony/framework-bundle": "^5.2",
+        "symfony/process": "^5.2",
         "symfony/yaml": "^5.2"
+    },
+    "replace": {
+        "symfony/polyfill-ctype": "*",
+        "symfony/polyfill-iconv": "*"
     },
     "config": {
         "optimize-autoloader": true,
@@ -19,6 +26,11 @@
             "*": "dist"
         },
         "sort-packages": true
+    },
+    "extra": {
+        "symfony": {
+            "allow-contrib": false
+        }
     },
     "autoload": {
         "psr-4": {
@@ -30,13 +42,12 @@
             "SymfonyCodeBlockChecker\\Tests\\": "tests/"
         }
     },
-    "replace": {
-        "symfony/polyfill-ctype": "*",
-        "symfony/polyfill-iconv": "*"
-    },
-    "extra": {
-        "symfony": {
-            "allow-contrib": false
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/weaverryan/docs-builder"
         }
-    }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }
