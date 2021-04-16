@@ -1,0 +1,6 @@
+services:
+  Symfony\Contracts\EventDispatcher\EventDispatcherInterface:
+    alias: 'Symfony\Component\EventDispatcher\EventDispatcher'
+    public: true
+
+  Symfony\Component\EventDispatcher\EventDispatcher: ~
