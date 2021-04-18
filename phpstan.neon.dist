@@ -1,0 +1,10 @@
+parameters:
+    level: 5
+    reportUnmatchedIgnoredErrors: false
+    paths:
+        - src
+    tmpDir: .github/.cache/phpstan/
+
+    excludes_analyse:
+        - src/*/tests/*
+        - src/*/vendor/*

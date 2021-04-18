@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  pull_request:
+
+jobs:
+  build:
+    needs: matrix
+    name: Test
+    runs-on: Ubuntu-20.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.0
+          coverage: none
+
+      - name: Download dependencies
+        uses: ramsey/composer-install@v1
+
+      - name: Run tests
+        run: ./vendor/bin/phpunit
+

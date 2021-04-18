@@ -27,8 +27,9 @@ class CheckDocsCommand extends Command
 {
     protected static $defaultName = 'verify:docs';
 
-    /** @var SymfonyStyle */
-    private $io;
+    private SymfonyStyle $io;
+    private ErrorManager $errorManager;
+    private ParseQueueProcessor $queueProcessor;
 
     public function __construct()
     {
@@ -49,11 +50,6 @@ class CheckDocsCommand extends Command
     {
         $this->io = new SymfonyStyle($input, $output);
 
-        $files = $input->getArgument('files');
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
         $sourceDir = $input->getArgument('source-dir');
         if (!file_exists($sourceDir)) {
             throw new \InvalidArgumentException(sprintf('RST source directory "%s" does not exist', $sourceDir));
@@ -62,25 +58,33 @@ class CheckDocsCommand extends Command
         $buildConfig->setContentDir($sourceDir);
 
         $kernel = \SymfonyDocsBuilder\KernelFactory::createKernel($buildConfig);
-        $errorManager = new ErrorManager($kernel->getConfiguration());
-        $eventManager = $kernel->getConfiguration()->getEventManager();
-        $eventManager->addEventListener(PostNodeCreateEvent::POST_NODE_CREATE, new ValidCodeNodeListener($errorManager));
+        $configuration = $kernel->getConfiguration();
+        $configuration->silentOnError(true);
+        $this->errorManager = new ErrorManager($configuration);
+        $eventManager = $configuration->getEventManager();
+        $eventManager->addEventListener(PostNodeCreateEvent::POST_NODE_CREATE, new ValidCodeNodeListener($this->errorManager));
 
-        $filesystem = new Filesystem();
         $metas = new Metas();
-        $documents = new Documents($filesystem, $metas);
+        $documents = new Documents(new Filesystem(), $metas);
 
-        $queueProcessor = new ParseQueueProcessor($kernel, $errorManager, $metas, $documents, $sourceDir, '/foo/target', 'rst');
+        $this->queueProcessor = new ParseQueueProcessor($kernel, $this->errorManager, $metas, $documents, $sourceDir, '/foo/target', 'rst');
+    }
 
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
         $files = $input->getArgument('files');
         $parseQueue = new ParseQueue();
         foreach ($files as $filename) {
+            // Remove ".rst"
+            if ('.rst' === substr($filename, -4)) {
+                $filename = substr($filename, 0, -4);
+            }
             $parseQueue->addFile(ltrim($filename, '/'), true);
         }
 
-        $queueProcessor->process($parseQueue);
+        $this->queueProcessor->process($parseQueue);
 
-        $errorCount = count($errorManager->getErrors());
+        $errorCount = count($this->errorManager->getErrors());
         if ($errorCount > 0) {
             $this->io->error(sprintf('Build completed with %s errors', $errorCount));
             return Command::FAILURE;

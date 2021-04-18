@@ -1,0 +1,118 @@
+name: Static analysis
+
+on:
+  pull_request: ~
+
+jobs:
+  phpstan:
+    name: PHPStan
+    runs-on: Ubuntu-20.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Cache PHPStan
+        uses: actions/cache@v2
+        with:
+          path: .github/.cache/phpstan/
+          key: phpstan-${{ github.sha }}
+          restore-keys: phpstan-
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.0
+          coverage: none
+
+      - name: Download dependencies
+        uses: ramsey/composer-install@v1
+        with:
+          composer-options: --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Download PHPStan
+        run: composer bin phpstan update --no-interaction --no-progress
+
+      - name: Execute PHPStan
+        run: vendor/bin/phpstan analyze --no-progress
+
+  php-cs-fixer:
+    name: PHP-CS-Fixer
+    runs-on: Ubuntu-20.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Cache PhpCsFixer
+        uses: actions/cache@v2
+        with:
+          path: .github/.cache/php-cs-fixer/
+          key: php-cs-fixer-${{ github.sha }}
+          restore-keys: php-cs-fixer-
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.0
+          coverage: none
+
+      - name: Download dependencies
+        uses: ramsey/composer-install@v1
+        with:
+          composer-options: --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Download PHP CS Fixer
+        run: composer bin php-cs-fixer update --no-interaction --no-progress
+
+      - name: Execute PHP CS Fixer
+        run: vendor/bin/php-cs-fixer fix --diff-format udiff --dry-run
+
+  psalm:
+    name: Psalm
+    runs-on: Ubuntu-20.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Cache Psalm
+        uses: actions/cache@v2
+        with:
+          path: .github/.cache/psalm/
+          key: psalm-${{ github.sha }}
+          restore-keys: psalm-
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.0
+          coverage: none
+
+      - name: Download dependencies
+        uses: ramsey/composer-install@v1
+        with:
+          composer-options: --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Download Psalm
+        run: composer bin psalm update --no-interaction --no-progress
+
+      - name: Execute Psalm
+        run: vendor/bin/psalm.phar --no-progress --output-format=github
+
+  composer-normalize:
+    name: Composer Normalize
+    runs-on: Ubuntu-20.04
+
+    steps:
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.0
+          coverage: none
+          tools: composer-normalize
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Normalize
+        run:  composer-normalize --dry-run
