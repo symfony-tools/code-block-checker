@@ -1,6 +1,6 @@
 <?php
 
-namespace SymfonyCodeBlockChecker\Tests\Listener;
+namespace Symfony\CodeBlockChecker\Tests\Listener;
 
 use Doctrine\RST\Configuration;
 use Doctrine\RST\Environment;
@@ -8,7 +8,7 @@ use Doctrine\RST\ErrorManager;
 use Doctrine\RST\Event\PostNodeCreateEvent;
 use Doctrine\RST\Nodes\CodeNode;
 use PHPUnit\Framework\TestCase;
-use SymfonyCodeBlockChecker\Listener\ValidCodeNodeListener;
+use Symfony\CodeBlockChecker\Listener\ValidCodeNodeListener;
 
 class ValidCodeNodeListenerTest extends TestCase
 {

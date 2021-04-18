@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SymfonyCodeBlockChecker;
+namespace Symfony\CodeBlockChecker;
 
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Input\InputInterface;
