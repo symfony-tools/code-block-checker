@@ -1,6 +1,6 @@
 <?php
 
-namespace SymfonyCodeBlockChecker;
+namespace Symfony\CodeBlockChecker;
 
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Config\FileLocator;

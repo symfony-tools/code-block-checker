@@ -39,12 +39,12 @@
     },
     "autoload": {
         "psr-4": {
-            "SymfonyCodeBlockChecker\\": "src/"
+            "Symfony\\CodeBlockChecker\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "SymfonyCodeBlockChecker\\Tests\\": "tests/"
+            "Symfony\\CodeBlockChecker\\Tests\\": "tests/"
         }
     },
     "repositories": [

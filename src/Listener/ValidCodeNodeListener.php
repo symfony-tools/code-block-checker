@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace SymfonyCodeBlockChecker\Listener;
+namespace Symfony\CodeBlockChecker\Listener;
 
 use Doctrine\RST\ErrorManager;
 use Doctrine\RST\Event\PostNodeCreateEvent;
 use Doctrine\RST\Nodes\CodeNode;
+use Symfony\CodeBlockChecker\Twig\DummyExtension;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
-use SymfonyCodeBlockChecker\Twig\DummyExtension;
 use Twig\Environment;
 use Twig\Error\SyntaxError;
 use Twig\Loader\ArrayLoader;

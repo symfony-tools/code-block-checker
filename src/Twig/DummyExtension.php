@@ -1,6 +1,6 @@
 <?php
 
-namespace SymfonyCodeBlockChecker\Twig;
+namespace Symfony\CodeBlockChecker\Twig;
 
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
