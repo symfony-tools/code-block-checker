@@ -8,6 +8,7 @@ use Doctrine\RST\ErrorManager;
 use Doctrine\RST\Event\PostNodeCreateEvent;
 use Doctrine\RST\Nodes\CodeNode;
 use PHPUnit\Framework\TestCase;
+use Symfony\CodeBlockChecker\Issue\IssueManger;
 use Symfony\CodeBlockChecker\Listener\ValidCodeNodeListener;
 
 class ValidCodeNodeListenerTest extends TestCase
@@ -22,7 +23,7 @@ class ValidCodeNodeListenerTest extends TestCase
         $config->silentOnError();
         $config->abortOnError(false);
 
-        $this->errorManager = new ErrorManager($config);
+        $this->errorManager = new IssueManger($config);
         $this->listener = new ValidCodeNodeListener($this->errorManager);
         $this->environment = new Environment($config);
     }
@@ -37,7 +38,7 @@ class ValidCodeNodeListenerTest extends TestCase
         $errors = $this->errorManager->getErrors();
         $this->assertCount(1, $errors);
 
-        $this->assertStringContainsString('Invalid Yaml', $errors[0]);
+        $this->assertStringContainsString('Malformed inline YAML', $errors[0]);
     }
 
     public function testParseTwig()

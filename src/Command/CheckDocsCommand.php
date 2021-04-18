@@ -7,13 +7,14 @@ namespace Symfony\CodeBlockChecker\Command;
 use Doctrine\RST\Builder\Documents;
 use Doctrine\RST\Builder\ParseQueue;
 use Doctrine\RST\Builder\ParseQueueProcessor;
-use Doctrine\RST\ErrorManager;
 use Doctrine\RST\Event\PostNodeCreateEvent;
 use Doctrine\RST\Meta\Metas;
+use Symfony\CodeBlockChecker\Issue\IssueManger;
 use Symfony\CodeBlockChecker\Listener\ValidCodeNodeListener;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Filesystem\Filesystem;
@@ -24,7 +25,7 @@ class CheckDocsCommand extends Command
     protected static $defaultName = 'verify:docs';
 
     private SymfonyStyle $io;
-    private ErrorManager $errorManager;
+    private IssueManger $errorManager;
     private ParseQueueProcessor $queueProcessor;
 
     public function __construct()
@@ -37,6 +38,7 @@ class CheckDocsCommand extends Command
         $this
             ->addArgument('source-dir', InputArgument::REQUIRED, 'RST files Source directory')
             ->addArgument('files', InputArgument::IS_ARRAY + InputArgument::REQUIRED, 'RST files that should be verified.')
+            ->addOption('output-format', null, InputOption::VALUE_OPTIONAL, 'Valid options are github and console', 'github')
             ->setDescription('Make sure the docs blocks are valid')
 
         ;
@@ -56,7 +58,7 @@ class CheckDocsCommand extends Command
         $kernel = \SymfonyDocsBuilder\KernelFactory::createKernel($buildConfig);
         $configuration = $kernel->getConfiguration();
         $configuration->silentOnError(true);
-        $this->errorManager = new ErrorManager($configuration);
+        $this->errorManager = new IssueManger($configuration);
         $eventManager = $configuration->getEventManager();
         $eventManager->addEventListener(PostNodeCreateEvent::POST_NODE_CREATE, new ValidCodeNodeListener($this->errorManager));
 
@@ -80,9 +82,21 @@ class CheckDocsCommand extends Command
 
         $this->queueProcessor->process($parseQueue);
 
-        $errorCount = count($this->errorManager->getErrors());
-        if ($errorCount > 0) {
-            $this->io->error(sprintf('Build completed with %s errors', $errorCount));
+        $issues = $this->errorManager->getIssues();
+        $issueCount = count($issues);
+        if ($issueCount > 0) {
+            $format = $input->getOption('output-format');
+            if ('console' === $format) {
+                foreach ($issues as $issue) {
+                    $this->io->writeln($issue->__toString());
+                }
+            } elseif ('github' === $format) {
+                foreach ($issues as $issue) {
+                    $this->io->writeln(sprintf('::error file=%s,line=%s::[%s] %s', $issue->getFile(), $issue->getLine(), $issue->getType(), $issue->getText()));
+                }
+            }
+
+            $this->io->error(sprintf('Build completed with %s errors', $issueCount));
 
             return Command::FAILURE;
         }
