@@ -1,12 +1,12 @@
 {
-    "name": "nyholm/symfony-code-block-checker",
+    "name": "symfony/code-block-checker",
     "type": "project",
     "license": "proprietary",
     "require": {
         "php": ">=8.0",
         "ext-ctype": "*",
         "ext-iconv": "*",
-        "doctrine/rst-parser": "0.4.x-dev",
+        "doctrine/rst-parser": "^0.4",
         "symfony/console": "^5.2",
         "symfony/docs-builder": "^0.15.0",
         "symfony/dotenv": "^5.2",
