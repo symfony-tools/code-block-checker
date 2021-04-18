@@ -23,7 +23,7 @@ class Issue implements \Stringable
     private ?int $line;
 
     /**
-     * The local line is inside the code node
+     * The local line is inside the code node.
      */
     private int $localLine;
 

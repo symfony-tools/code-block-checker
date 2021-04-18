@@ -16,7 +16,12 @@ class LineDetector
      */
     public static function find(CodeNode $node): int
     {
-        $file = sprintf('%s/%s.rst', $node->getEnvironment()->getCurrentDirectory(), $node->getEnvironment()->getCurrentFileName());
+        $environment = $node->getEnvironment();
+        if ('' === $environment->getCurrentFileName()) {
+            return 0;
+        }
+
+        $file = sprintf('%s/%s.rst', $environment->getCurrentDirectory(), $environment->getCurrentFileName());
         $contents = explode(PHP_EOL, file_get_contents($file));
         $codeBlock = explode(PHP_EOL, $node->getValue());
 
