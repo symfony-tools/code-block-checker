@@ -2,6 +2,9 @@
 
 namespace Symfony\CodeBlockChecker\Issue;
 
+use Doctrine\RST\Nodes\CodeNode;
+use Symfony\CodeBlockChecker\Service\LineDetector;
+
 /**
  * Represent an error with some code.
  *
@@ -9,17 +12,34 @@ namespace Symfony\CodeBlockChecker\Issue;
  */
 class Issue implements \Stringable
 {
+    private CodeNode $node;
     private string $text;
     private string $type;
     private string $file;
-    private int $line;
 
-    public function __construct(string $text, string $type, string $file, int $line)
+    /**
+     * The line in the file.
+     */
+    private ?int $line;
+
+    /**
+     * The local line is inside the code node
+     */
+    private int $localLine;
+
+    public function __construct(CodeNode $node, string $text, string $type, string $file, int $localLine)
     {
+        $this->node = $node;
         $this->text = $text;
         $this->type = $type;
         $this->file = $file;
-        $this->line = $line;
+        $this->localLine = $localLine;
+        $this->line = null;
+    }
+
+    public function getHash(): string
+    {
+        return sha1($this->node->getValue());
     }
 
     public function getText(): string
@@ -39,6 +59,11 @@ class Issue implements \Stringable
 
     public function getLine(): int
     {
+        if (null === $this->line) {
+            $offset = LineDetector::find($this->node);
+            $this->line = $offset + $this->localLine;
+        }
+
         return $this->line;
     }
 
