@@ -9,10 +9,7 @@ use Doctrine\RST\Builder\ParseQueue;
 use Doctrine\RST\Builder\ParseQueueProcessor;
 use Doctrine\RST\ErrorManager;
 use Doctrine\RST\Event\PostNodeCreateEvent;
-use Doctrine\RST\Event\PostParseDocumentEvent;
-use Doctrine\RST\Meta\CachedMetasLoader;
 use Doctrine\RST\Meta\Metas;
-use Doctrine\RST\Parser;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -21,7 +18,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Filesystem\Filesystem;
 use SymfonyCodeBlockChecker\Listener\ValidCodeNodeListener;
 use SymfonyDocsBuilder\BuildConfig;
-
 
 class CheckDocsCommand extends Command
 {
@@ -87,6 +83,7 @@ class CheckDocsCommand extends Command
         $errorCount = count($this->errorManager->getErrors());
         if ($errorCount > 0) {
             $this->io->error(sprintf('Build completed with %s errors', $errorCount));
+
             return Command::FAILURE;
         }
         $this->io->success('Build completed successfully!');

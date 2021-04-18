@@ -6,8 +6,6 @@ namespace SymfonyCodeBlockChecker\Listener;
 
 use Doctrine\RST\ErrorManager;
 use Doctrine\RST\Event\PostNodeCreateEvent;
-use Doctrine\RST\Event\PostParseDocumentEvent;
-use Doctrine\RST\Event\PreNodeRenderEvent;
 use Doctrine\RST\Nodes\CodeNode;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Yaml\Exception\ParseException;
@@ -63,7 +61,7 @@ class ValidCodeNodeListener
 
         // Allow us to use "..." as a placeholder
         $contents = str_replace('...', 'null', $contents);
-        file_put_contents($file, '<?php' . PHP_EOL . $contents);
+        file_put_contents($file, '<?php'.PHP_EOL.$contents);
 
         $process = new Process(['php', '-l', $file]);
         $process->run();

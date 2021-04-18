@@ -1,0 +1,12 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Instantiated class CachedContainer not found\\.$#"
+			count: 1
+			path: src/Kernel.php
+
+		-
+			message: "#^Property SymfonyCodeBlockChecker\\\\Kernel\\:\\:\\$container \\(Symfony\\\\Component\\\\DependencyInjection\\\\Container\\) does not accept CachedContainer\\.$#"
+			count: 1
+			path: src/Kernel.php
+
