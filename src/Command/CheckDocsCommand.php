@@ -109,7 +109,7 @@ class CheckDocsCommand extends Command
                 }
             } elseif ('github' === $format) {
                 foreach ($issues as $issue) {
-                    $this->io->writeln(sprintf('::error file=%s,line=%s::[%s] %s', $issue->getFile(), $issue->getLine(), $issue->getType(), $issue->getText()));
+                    $this->io->writeln(sprintf('::error file=%s.rst,line=%s::[%s] %s', $issue->getFile(), $issue->getLine(), $issue->getType(), $issue->getText()));
                 }
             }
 

@@ -31,7 +31,7 @@ class Issue implements \Stringable
     public function __construct(CodeNode $node, string $text, string $type, string $file, int $localLine)
     {
         $this->node = $node;
-        $this->text = $text;
+        $this->text = trim($text);
         $this->type = $type;
         $this->file = $file;
         $this->localLine = $localLine;
