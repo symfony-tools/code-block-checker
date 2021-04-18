@@ -10,7 +10,6 @@ use Doctrine\RST\Builder\ParseQueueProcessor;
 use Doctrine\RST\ErrorManager;
 use Doctrine\RST\Event\PostNodeCreateEvent;
 use Doctrine\RST\Meta\Metas;
-use Symfony\CodeBlockChecker\Issue\IssueCollection;
 use Symfony\CodeBlockChecker\Listener\CodeNodeCollector;
 use Symfony\CodeBlockChecker\Service\Baseline;
 use Symfony\CodeBlockChecker\Service\CodeValidator;
@@ -93,9 +92,9 @@ class CheckDocsCommand extends Command
 
         if ($baselineFile = $input->getOption('generate-baseline')) {
             $this->baseline->generate($issues, $baselineFile);
+
             return Command::SUCCESS;
         }
-
 
         if ($baselineFile = $input->getOption('baseline')) {
             $issues = $this->baseline->filter($issues, $baselineFile);

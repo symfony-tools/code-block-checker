@@ -78,7 +78,7 @@ class Issue implements \Stringable
     {
         if (null === $this->erroredLine) {
             $lines = explode(PHP_EOL, $this->node->getValue());
-            $this->erroredLine = $lines[$this->localLine-1];
+            $this->erroredLine = $lines[$this->localLine - 1];
         }
 
         return $this->erroredLine;
