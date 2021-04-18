@@ -32,8 +32,7 @@ class LineDetector
                 }
             }
 
-            // The file's first row is 1 and our arrays first index is 0.
-            return $i + 1;
+            return $i;
         }
 
         return 0;
