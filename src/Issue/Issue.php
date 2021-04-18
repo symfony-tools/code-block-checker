@@ -16,6 +16,7 @@ class Issue implements \Stringable
     private string $text;
     private string $type;
     private string $file;
+    private ?string $erroredLine;
 
     /**
      * The line in the file.
@@ -35,6 +36,7 @@ class Issue implements \Stringable
         $this->file = $file;
         $this->localLine = $localLine;
         $this->line = null;
+        $this->erroredLine = null;
     }
 
     public function getHash(): string
@@ -65,6 +67,21 @@ class Issue implements \Stringable
         }
 
         return $this->line;
+    }
+
+    public function getLocalLine(): int
+    {
+        return $this->localLine;
+    }
+
+    public function getErroredLine()
+    {
+        if (null === $this->erroredLine) {
+            $lines = explode(PHP_EOL, $this->node->getValue());
+            $this->erroredLine = $lines[$this->localLine - 1];
+        }
+
+        return $this->erroredLine;
     }
 
     public function __toString()

@@ -6,6 +6,9 @@
     </UndefinedClass>
   </file>
   <file src="src/Service/CodeValidator.php">
-    <InvalidArgument occurrences="1"/>
+    <InvalidArgument occurrences="3">
+      <code>'bis'</code>
+      <code>'foobar'</code>
+    </InvalidArgument>
   </file>
 </files>

@@ -10,8 +10,8 @@ use Doctrine\RST\Builder\ParseQueueProcessor;
 use Doctrine\RST\ErrorManager;
 use Doctrine\RST\Event\PostNodeCreateEvent;
 use Doctrine\RST\Meta\Metas;
-use Symfony\CodeBlockChecker\Issue\IssueCollection;
 use Symfony\CodeBlockChecker\Listener\CodeNodeCollector;
+use Symfony\CodeBlockChecker\Service\Baseline;
 use Symfony\CodeBlockChecker\Service\CodeValidator;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -27,15 +27,16 @@ class CheckDocsCommand extends Command
     protected static $defaultName = 'verify:docs';
 
     private SymfonyStyle $io;
-    private IssueCollection $errorManager;
     private ParseQueueProcessor $queueProcessor;
     private CodeNodeCollector $collector;
     private CodeValidator $validator;
+    private Baseline $baseline;
 
-    public function __construct(CodeValidator $validator)
+    public function __construct(CodeValidator $validator, Baseline $baseline)
     {
         parent::__construct(self::$defaultName);
         $this->validator = $validator;
+        $this->baseline = $baseline;
     }
 
     protected function configure()
@@ -43,9 +44,10 @@ class CheckDocsCommand extends Command
         $this
             ->addArgument('source-dir', InputArgument::REQUIRED, 'RST files Source directory')
             ->addArgument('files', InputArgument::IS_ARRAY + InputArgument::REQUIRED, 'RST files that should be verified.')
-            ->addOption('output-format', null, InputOption::VALUE_OPTIONAL, 'Valid options are github and console', 'github')
+            ->addOption('output-format', null, InputOption::VALUE_REQUIRED, 'Valid options are github and console', 'github')
+            ->addOption('generate-baseline', null, InputOption::VALUE_REQUIRED, 'Generate a new baseline', false)
+            ->addOption('baseline', null, InputOption::VALUE_REQUIRED, 'Use a baseline', false)
             ->setDescription('Make sure the docs blocks are valid')
-
         ;
     }
 
@@ -87,6 +89,16 @@ class CheckDocsCommand extends Command
         // This will collect all CodeNodes
         $this->queueProcessor->process($parseQueue);
         $issues = $this->validator->validateNodes($this->collector->getNodes());
+
+        if ($baselineFile = $input->getOption('generate-baseline')) {
+            $this->baseline->generate($issues, $baselineFile);
+
+            return Command::SUCCESS;
+        }
+
+        if ($baselineFile = $input->getOption('baseline')) {
+            $issues = $this->baseline->filter($issues, $baselineFile);
+        }
 
         $issueCount = count($issues);
         if ($issueCount > 0) {
