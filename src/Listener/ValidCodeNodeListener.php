@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Symfony\CodeBlockChecker\Listener;
 
-use Doctrine\RST\ErrorManager;
 use Doctrine\RST\Event\PostNodeCreateEvent;
 use Doctrine\RST\Nodes\CodeNode;
 use Symfony\CodeBlockChecker\Issue\Issue;

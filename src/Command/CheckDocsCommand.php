@@ -7,7 +7,6 @@ namespace Symfony\CodeBlockChecker\Command;
 use Doctrine\RST\Builder\Documents;
 use Doctrine\RST\Builder\ParseQueue;
 use Doctrine\RST\Builder\ParseQueueProcessor;
-use Doctrine\RST\ErrorManager;
 use Doctrine\RST\Event\PostNodeCreateEvent;
 use Doctrine\RST\Meta\Metas;
 use Symfony\CodeBlockChecker\Issue\IssueManger;
@@ -87,9 +86,9 @@ class CheckDocsCommand extends Command
         $issueCount = count($issues);
         if ($issueCount > 0) {
             $format = $input->getOption('output-format');
-            if ($format === 'console') {
+            if ('console' === $format) {
                 foreach ($issues as $issue) {
-                    $this->io->writeln($issue);
+                    $this->io->writeln($issue->__toString());
                 }
             } elseif ('github' === $format) {
                 foreach ($issues as $issue) {

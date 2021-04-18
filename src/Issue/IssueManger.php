@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Symfony\CodeBlockChecker\Issue;
 
 use Doctrine\RST\ErrorManager;
