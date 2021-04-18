@@ -7,6 +7,8 @@ namespace Symfony\CodeBlockChecker\Listener;
 use Doctrine\RST\ErrorManager;
 use Doctrine\RST\Event\PostNodeCreateEvent;
 use Doctrine\RST\Nodes\CodeNode;
+use Symfony\CodeBlockChecker\Issue\Issue;
+use Symfony\CodeBlockChecker\Issue\IssueManger;
 use Symfony\CodeBlockChecker\Twig\DummyExtension;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Yaml\Exception\ParseException;
@@ -26,7 +28,7 @@ class ValidCodeNodeListener
     private $errorManager;
     private $twig;
 
-    public function __construct(ErrorManager $errorManager)
+    public function __construct(IssueManger $errorManager)
     {
         $this->errorManager = $errorManager;
     }
@@ -70,11 +72,13 @@ class ValidCodeNodeListener
             return;
         }
 
-        $this->errorManager->error(sprintf(
-            'Invalid PHP syntax in "%s": %s',
-            $node->getEnvironment()->getCurrentFileName(),
-            str_replace($file, 'example.php', $process->getErrorOutput())
-        ));
+        $line = 0;
+        $text = str_replace($file, 'example.php', $process->getErrorOutput());
+        if (preg_match('| in example.php on line ([0-9]+)|s', $text, $matches)) {
+            $text = str_replace($matches[0], '', $text);
+            $line = (int) $matches[1];
+        }
+        $this->errorManager->addIssue(new Issue($text, 'Invalid syntax', $node->getEnvironment()->getCurrentFileName(), $line));
     }
 
     private function validateXml(CodeNode $node)
@@ -97,11 +101,8 @@ class ValidCodeNodeListener
             if ('SimpleXMLElement::__construct(): namespace error : Namespace prefix' === substr($e->getMessage(), 0, 67)) {
                 return;
             }
-            $this->errorManager->error(sprintf(
-                'Invalid Xml in "%s": %s',
-                $node->getEnvironment()->getCurrentFileName(),
-                $e->getMessage()
-            ));
+
+            $this->errorManager->addIssue(new Issue($e->getMessage(), 'Invalid syntax', $node->getEnvironment()->getCurrentFileName(), 0));
         }
     }
 
@@ -116,11 +117,7 @@ class ValidCodeNodeListener
                 return;
             }
 
-            $this->errorManager->error(sprintf(
-                'Invalid Yaml in "%s": %s',
-                $node->getEnvironment()->getCurrentFileName(),
-                $e->getMessage()
-            ));
+            $this->errorManager->addIssue(new Issue($e->getMessage(), 'Invalid syntax', $node->getEnvironment()->getCurrentFileName(), 0));
         }
     }
 
@@ -136,21 +133,16 @@ class ValidCodeNodeListener
             // We cannot parse the TokenStream because we dont have all extensions loaded.
             $this->twig->parse($tokens);
         } catch (SyntaxError $e) {
-            $this->errorManager->error(sprintf(
-                'Invalid Twig syntax: %s',
-                $e->getMessage()
-            ));
+            $this->errorManager->addIssue(new Issue($e->getMessage(), 'Invalid syntax', $node->getEnvironment()->getCurrentFileName(), 0));
         }
     }
 
     private function validateJson(CodeNode $node)
     {
-        $data = json_decode($node->getValue(), true);
-        if (null === $data) {
-            $this->errorManager->error(sprintf(
-                'Invalid Json in "%s"',
-                $node->getEnvironment()->getCurrentFileName()
-            ));
+        try {
+            $data = json_decode($node->getValue(), true, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException $e) {
+            $this->errorManager->addIssue(new Issue($e->getMessage(), 'Invalid syntax', $node->getEnvironment()->getCurrentFileName(), 0));
         }
     }
 }
