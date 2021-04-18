@@ -2,12 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Symfony\CodeBlockChecker\Listener;
+namespace Symfony\CodeBlockChecker\Service;
 
-use Doctrine\RST\Event\PostNodeCreateEvent;
 use Doctrine\RST\Nodes\CodeNode;
 use Symfony\CodeBlockChecker\Issue\Issue;
-use Symfony\CodeBlockChecker\Issue\IssueManger;
+use Symfony\CodeBlockChecker\Issue\IssueCollection;
 use Symfony\CodeBlockChecker\Twig\DummyExtension;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Yaml\Exception\ParseException;
@@ -22,23 +21,23 @@ use Twig\Source;
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class ValidCodeNodeListener
+class CodeValidator
 {
-    private $errorManager;
     private $twig;
+    private IssueCollection $issues;
 
-    public function __construct(IssueManger $errorManager)
+    public function validateNodes(array $nodes): IssueCollection
     {
-        $this->errorManager = $errorManager;
-    }
-
-    public function postNodeCreate(PostNodeCreateEvent $event)
-    {
-        $node = $event->getNode();
-        if (!$node instanceof CodeNode) {
-            return;
+        $this->issues = new IssueCollection();
+        foreach ($nodes as $node) {
+            $this->validateNode($node);
         }
 
+        return $this->issues;
+    }
+
+    private function validateNode(CodeNode $node): void
+    {
         $language = $node->getLanguage() ?? ($node->isRaw() ? null : 'php');
         if (in_array($language, ['php', 'php-symfony', 'php-standalone', 'php-annotations'])) {
             $this->validatePhp($node);
@@ -75,9 +74,9 @@ class ValidCodeNodeListener
         $text = str_replace($file, 'example.php', $process->getErrorOutput());
         if (preg_match('| in example.php on line ([0-9]+)|s', $text, $matches)) {
             $text = str_replace($matches[0], '', $text);
-            $line = (int) $matches[1];
+            $line = ((int) $matches[1]) - 1; // we added "<?php"
         }
-        $this->errorManager->addIssue(new Issue($node, $text, 'Invalid syntax', $node->getEnvironment()->getCurrentFileName(), $line));
+        $this->issues->addIssue(new Issue($node, $text, 'Invalid syntax', $node->getEnvironment()->getCurrentFileName(), $line));
     }
 
     private function validateXml(CodeNode $node)
@@ -101,7 +100,7 @@ class ValidCodeNodeListener
                 return;
             }
 
-            $this->errorManager->addIssue(new Issue($node, $e->getMessage(), 'Invalid syntax', $node->getEnvironment()->getCurrentFileName(), 0));
+            $this->issues->addIssue(new Issue($node, $e->getMessage(), 'Invalid syntax', $node->getEnvironment()->getCurrentFileName(), 0));
         }
     }
 
@@ -116,7 +115,7 @@ class ValidCodeNodeListener
                 return;
             }
 
-            $this->errorManager->addIssue(new Issue($node, $e->getMessage(), 'Invalid syntax', $node->getEnvironment()->getCurrentFileName(), 0));
+            $this->issues->addIssue(new Issue($node, $e->getMessage(), 'Invalid syntax', $node->getEnvironment()->getCurrentFileName(), 0));
         }
     }
 
@@ -132,7 +131,7 @@ class ValidCodeNodeListener
             // We cannot parse the TokenStream because we dont have all extensions loaded.
             $this->twig->parse($tokens);
         } catch (SyntaxError $e) {
-            $this->errorManager->addIssue(new Issue($node, $e->getMessage(), 'Invalid syntax', $node->getEnvironment()->getCurrentFileName(), 0));
+            $this->issues->addIssue(new Issue($node, $e->getMessage(), 'Invalid syntax', $node->getEnvironment()->getCurrentFileName(), 0));
         }
     }
 
@@ -141,7 +140,7 @@ class ValidCodeNodeListener
         try {
             $data = json_decode($node->getValue(), true, 512, JSON_THROW_ON_ERROR);
         } catch (\JsonException $e) {
-            $this->errorManager->addIssue(new Issue($node, $e->getMessage(), 'Invalid syntax', $node->getEnvironment()->getCurrentFileName(), 0));
+            $this->issues->addIssue(new Issue($node, $e->getMessage(), 'Invalid syntax', $node->getEnvironment()->getCurrentFileName(), 0));
         }
     }
 }

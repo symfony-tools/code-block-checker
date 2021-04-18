@@ -7,10 +7,12 @@ namespace Symfony\CodeBlockChecker\Command;
 use Doctrine\RST\Builder\Documents;
 use Doctrine\RST\Builder\ParseQueue;
 use Doctrine\RST\Builder\ParseQueueProcessor;
+use Doctrine\RST\ErrorManager;
 use Doctrine\RST\Event\PostNodeCreateEvent;
 use Doctrine\RST\Meta\Metas;
-use Symfony\CodeBlockChecker\Issue\IssueManger;
-use Symfony\CodeBlockChecker\Listener\ValidCodeNodeListener;
+use Symfony\CodeBlockChecker\Issue\IssueCollection;
+use Symfony\CodeBlockChecker\Listener\CodeNodeCollector;
+use Symfony\CodeBlockChecker\Service\CodeValidator;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -25,12 +27,15 @@ class CheckDocsCommand extends Command
     protected static $defaultName = 'verify:docs';
 
     private SymfonyStyle $io;
-    private IssueManger $errorManager;
+    private IssueCollection $errorManager;
     private ParseQueueProcessor $queueProcessor;
+    private CodeNodeCollector $collector;
+    private CodeValidator $validator;
 
-    public function __construct()
+    public function __construct(CodeValidator $validator)
     {
         parent::__construct(self::$defaultName);
+        $this->validator = $validator;
     }
 
     protected function configure()
@@ -58,14 +63,13 @@ class CheckDocsCommand extends Command
         $kernel = \SymfonyDocsBuilder\KernelFactory::createKernel($buildConfig);
         $configuration = $kernel->getConfiguration();
         $configuration->silentOnError(true);
-        $this->errorManager = new IssueManger($configuration);
         $eventManager = $configuration->getEventManager();
-        $eventManager->addEventListener(PostNodeCreateEvent::POST_NODE_CREATE, new ValidCodeNodeListener($this->errorManager));
+        $eventManager->addEventListener(PostNodeCreateEvent::POST_NODE_CREATE, $this->collector = new CodeNodeCollector());
 
         $metas = new Metas();
         $documents = new Documents(new Filesystem(), $metas);
 
-        $this->queueProcessor = new ParseQueueProcessor($kernel, $this->errorManager, $metas, $documents, $sourceDir, '/foo/target', 'rst');
+        $this->queueProcessor = new ParseQueueProcessor($kernel, new ErrorManager($configuration), $metas, $documents, $sourceDir, '/foo/target', 'rst');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -80,9 +84,10 @@ class CheckDocsCommand extends Command
             $parseQueue->addFile(ltrim($filename, '/'), true);
         }
 
+        // This will collect all CodeNodes
         $this->queueProcessor->process($parseQueue);
+        $issues = $this->validator->validateNodes($this->collector->getNodes());
 
-        $issues = $this->errorManager->getIssues();
         $issueCount = count($issues);
         if ($issueCount > 0) {
             $format = $input->getOption('output-format');

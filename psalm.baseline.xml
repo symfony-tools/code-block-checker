@@ -5,7 +5,7 @@
       <code>\CachedContainer</code>
     </UndefinedClass>
   </file>
-  <file src="src/Listener/ValidCodeNodeListener.php">
+  <file src="src/Service/CodeValidator.php">
     <InvalidArgument occurrences="1"/>
   </file>
 </files>

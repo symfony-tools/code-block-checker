@@ -8,13 +8,13 @@ use Doctrine\RST\ErrorManager;
 use Doctrine\RST\Event\PostNodeCreateEvent;
 use Doctrine\RST\Nodes\CodeNode;
 use PHPUnit\Framework\TestCase;
-use Symfony\CodeBlockChecker\Issue\IssueManger;
-use Symfony\CodeBlockChecker\Listener\ValidCodeNodeListener;
+use Symfony\CodeBlockChecker\Issue\IssueCollection;
+use Symfony\CodeBlockChecker\Listener\CodeNodeCollector;
 
 class ValidCodeNodeListenerTest extends TestCase
 {
     private ErrorManager $errorManager;
-    private ValidCodeNodeListener $listener;
+    private CodeNodeCollector $listener;
     private Environment $environment;
 
     protected function setUp(): void
@@ -23,8 +23,8 @@ class ValidCodeNodeListenerTest extends TestCase
         $config->silentOnError();
         $config->abortOnError(false);
 
-        $this->errorManager = new IssueManger($config);
-        $this->listener = new ValidCodeNodeListener($this->errorManager);
+        $this->errorManager = new IssueCollection($config);
+        $this->listener = new CodeNodeCollector($this->errorManager);
         $this->environment = new Environment($config);
     }
 
