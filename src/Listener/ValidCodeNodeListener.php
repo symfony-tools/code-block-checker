@@ -10,6 +10,7 @@ use Doctrine\RST\Nodes\CodeNode;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
+use SymfonyCodeBlockChecker\Twig\DummyExtension;
 use Twig\Environment;
 use Twig\Error\SyntaxError;
 use Twig\Loader\ArrayLoader;
@@ -125,12 +126,15 @@ class ValidCodeNodeListener
 
     private function validateTwig(CodeNode $node)
     {
-        $twig = $this->twig ?? new Environment(new ArrayLoader());
+        if (null === $this->twig) {
+            $this->twig = new Environment(new ArrayLoader());
+            $this->twig->addExtension(new DummyExtension());
+        }
 
         try {
-            $tokens = $twig->tokenize(new Source($node->getValue(), $node->getEnvironment()->getCurrentFileName()));
+            $tokens = $this->twig->tokenize(new Source($node->getValue(), $node->getEnvironment()->getCurrentFileName()));
             // We cannot parse the TokenStream because we dont have all extensions loaded.
-            // $twig->parse($tokens);
+            $this->twig->parse($tokens);
         } catch (SyntaxError $e) {
             $this->errorManager->error(sprintf(
                 'Invalid Twig syntax: %s',

@@ -39,4 +39,15 @@ class ValidCodeNodeListenerTest extends TestCase
 
         $this->assertStringContainsString('Invalid Yaml', $errors[0]);
     }
+
+    public function testParseTwig()
+    {
+        $node = new CodeNode(['{{ form(form) }}']);
+        $node->setEnvironment($this->environment);
+        $node->setLanguage('twig');
+        $this->listener->postNodeCreate(new PostNodeCreateEvent($node));
+
+        $errors = $this->errorManager->getErrors();
+        $this->assertCount(0, $errors);
+    }
 }
