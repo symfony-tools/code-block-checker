@@ -44,4 +44,12 @@ class IssueCollection implements \Iterator, \Countable
     {
         return count($this->issues);
     }
+
+    /**
+     * Get first issue or null.
+     */
+    public function first(): ?Issue
+    {
+        return $this->issues[0] ?? null;
+    }
 }

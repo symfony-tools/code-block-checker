@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\CodeBlockChecker\Tests\Listener;
+namespace Symfony\CodeBlockChecker\Tests\Service;
 
 use Doctrine\RST\Configuration;
 use Doctrine\RST\Environment;
@@ -10,22 +10,17 @@ use Doctrine\RST\Nodes\CodeNode;
 use PHPUnit\Framework\TestCase;
 use Symfony\CodeBlockChecker\Issue\IssueCollection;
 use Symfony\CodeBlockChecker\Listener\CodeNodeCollector;
+use Symfony\CodeBlockChecker\Service\CodeValidator;
 
-class ValidCodeNodeListenerTest extends TestCase
+class CodeValidatorTest extends TestCase
 {
-    private ErrorManager $errorManager;
-    private CodeNodeCollector $listener;
+    private CodeValidator $validator;
     private Environment $environment;
 
     protected function setUp(): void
     {
-        $config = new Configuration();
-        $config->silentOnError();
-        $config->abortOnError(false);
-
-        $this->errorManager = new IssueCollection($config);
-        $this->listener = new CodeNodeCollector($this->errorManager);
-        $this->environment = new Environment($config);
+        $this->environment = new Environment(new Configuration());
+        $this->validator = new CodeValidator();
     }
 
     public function testInvalidYaml()
@@ -33,12 +28,9 @@ class ValidCodeNodeListenerTest extends TestCase
         $node = new CodeNode(['foobar: "test']);
         $node->setEnvironment($this->environment);
         $node->setLanguage('yaml');
-        $this->listener->postNodeCreate(new PostNodeCreateEvent($node));
-
-        $errors = $this->errorManager->getErrors();
+        $errors = $this->validator->validateNodes([$node]);
         $this->assertCount(1, $errors);
-
-        $this->assertStringContainsString('Malformed inline YAML', $errors[0]);
+        $this->assertStringContainsString('Malformed inline YAML', $errors->first());
     }
 
     public function testParseTwig()
@@ -46,9 +38,7 @@ class ValidCodeNodeListenerTest extends TestCase
         $node = new CodeNode(['{{ form(form) }}']);
         $node->setEnvironment($this->environment);
         $node->setLanguage('twig');
-        $this->listener->postNodeCreate(new PostNodeCreateEvent($node));
-
-        $errors = $this->errorManager->getErrors();
+        $errors = $this->validator->validateNodes([$node]);
         $this->assertCount(0, $errors);
     }
 }
