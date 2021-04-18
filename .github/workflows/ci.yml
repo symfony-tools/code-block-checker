@@ -5,7 +5,6 @@ on:
 
 jobs:
   build:
-    needs: matrix
     name: Test
     runs-on: Ubuntu-20.04
 
