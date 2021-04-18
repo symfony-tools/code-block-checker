@@ -77,7 +77,7 @@ class ValidCodeNodeListener
             $text = str_replace($matches[0], '', $text);
             $line = (int) $matches[1];
         }
-        $this->errorManager->addIssue(new Issue($text, 'Invalid syntax', $node->getEnvironment()->getCurrentFileName(), $line));
+        $this->errorManager->addIssue(new Issue($node, $text, 'Invalid syntax', $node->getEnvironment()->getCurrentFileName(), $line));
     }
 
     private function validateXml(CodeNode $node)
@@ -101,7 +101,7 @@ class ValidCodeNodeListener
                 return;
             }
 
-            $this->errorManager->addIssue(new Issue($e->getMessage(), 'Invalid syntax', $node->getEnvironment()->getCurrentFileName(), 0));
+            $this->errorManager->addIssue(new Issue($node, $e->getMessage(), 'Invalid syntax', $node->getEnvironment()->getCurrentFileName(), 0));
         }
     }
 
@@ -116,7 +116,7 @@ class ValidCodeNodeListener
                 return;
             }
 
-            $this->errorManager->addIssue(new Issue($e->getMessage(), 'Invalid syntax', $node->getEnvironment()->getCurrentFileName(), 0));
+            $this->errorManager->addIssue(new Issue($node, $e->getMessage(), 'Invalid syntax', $node->getEnvironment()->getCurrentFileName(), 0));
         }
     }
 
@@ -132,7 +132,7 @@ class ValidCodeNodeListener
             // We cannot parse the TokenStream because we dont have all extensions loaded.
             $this->twig->parse($tokens);
         } catch (SyntaxError $e) {
-            $this->errorManager->addIssue(new Issue($e->getMessage(), 'Invalid syntax', $node->getEnvironment()->getCurrentFileName(), 0));
+            $this->errorManager->addIssue(new Issue($node, $e->getMessage(), 'Invalid syntax', $node->getEnvironment()->getCurrentFileName(), 0));
         }
     }
 
@@ -141,7 +141,7 @@ class ValidCodeNodeListener
         try {
             $data = json_decode($node->getValue(), true, 512, JSON_THROW_ON_ERROR);
         } catch (\JsonException $e) {
-            $this->errorManager->addIssue(new Issue($e->getMessage(), 'Invalid syntax', $node->getEnvironment()->getCurrentFileName(), 0));
+            $this->errorManager->addIssue(new Issue($node, $e->getMessage(), 'Invalid syntax', $node->getEnvironment()->getCurrentFileName(), 0));
         }
     }
 }
