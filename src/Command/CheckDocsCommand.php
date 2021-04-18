@@ -107,13 +107,13 @@ class CheckDocsCommand extends Command
                 foreach ($issues as $issue) {
                     $this->io->writeln($issue->__toString());
                 }
+
+                $this->io->error(sprintf('Build completed with %s errors', $issueCount));
             } elseif ('github' === $format) {
                 foreach ($issues as $issue) {
                     $this->io->writeln(sprintf('::error file=%s.rst,line=%s::[%s] %s', $issue->getFile(), $issue->getLine(), $issue->getType(), $issue->getText()));
                 }
             }
-
-            $this->io->error(sprintf('Build completed with %s errors', $issueCount));
 
             return Command::FAILURE;
         }
