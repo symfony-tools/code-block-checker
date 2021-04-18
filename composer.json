@@ -16,13 +16,13 @@
         "symfony/process": "^5.2",
         "symfony/yaml": "^5.2"
     },
-    "require-dev": {
-        "bamarni/composer-bin-plugin": "^1.4.1",
-        "phpunit/phpunit": "^9.3.10"
-    },
     "replace": {
         "symfony/polyfill-ctype": "*",
         "symfony/polyfill-iconv": "*"
+    },
+    "require-dev": {
+        "bamarni/composer-bin-plugin": "^1.4.1",
+        "phpunit/phpunit": "^9.3.10"
     },
     "config": {
         "optimize-autoloader": true,
