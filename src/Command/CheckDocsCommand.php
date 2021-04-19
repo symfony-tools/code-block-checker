@@ -12,6 +12,7 @@ use Doctrine\RST\Event\PostNodeCreateEvent;
 use Doctrine\RST\Meta\Metas;
 use Symfony\CodeBlockChecker\Listener\CodeNodeCollector;
 use Symfony\CodeBlockChecker\Service\Baseline;
+use Symfony\CodeBlockChecker\Service\CodeNodeRunner;
 use Symfony\CodeBlockChecker\Service\CodeValidator;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -32,12 +33,14 @@ class CheckDocsCommand extends Command
     private CodeNodeCollector $collector;
     private CodeValidator $validator;
     private Baseline $baseline;
+    private CodeNodeRunner $codeNodeRunner;
 
-    public function __construct(CodeValidator $validator, Baseline $baseline)
+    public function __construct(CodeValidator $validator, Baseline $baseline, CodeNodeRunner $codeNodeRunner)
     {
         parent::__construct(self::$defaultName);
         $this->validator = $validator;
         $this->baseline = $baseline;
+        $this->codeNodeRunner = $codeNodeRunner;
     }
 
     protected function configure()
@@ -45,7 +48,8 @@ class CheckDocsCommand extends Command
         $this
             ->addArgument('source-dir', InputArgument::REQUIRED, 'RST files Source directory')
             ->addArgument('files', InputArgument::IS_ARRAY, 'RST files that should be verified.', [])
-            ->addOption('output-format', null, InputOption::VALUE_REQUIRED, 'Valid options are github and console', 'github')
+            ->addOption('output-format', null, InputOption::VALUE_REQUIRED, 'Valid options are "github" and "console"', 'console')
+            ->addOption('symfony-application', null, InputOption::VALUE_REQUIRED, 'Path to a symfony application to test the code blocks', false)
             ->addOption('generate-baseline', null, InputOption::VALUE_REQUIRED, 'Generate a new baseline', false)
             ->addOption('baseline', null, InputOption::VALUE_REQUIRED, 'Use a baseline', false)
             ->setDescription('Make sure the docs blocks are valid')
@@ -93,7 +97,11 @@ class CheckDocsCommand extends Command
 
         // This will collect all CodeNodes
         $this->queueProcessor->process($parseQueue);
+        // Verify code blocks
         $issues = $this->validator->validateNodes($this->collector->getNodes());
+        if ($applicationDir = $input->getOption('symfony-application')) {
+            $issues->append($this->codeNodeRunner->runNodes($this->collector->getNodes(), $applicationDir));
+        }
 
         if ($baselineFile = $input->getOption('generate-baseline')) {
             $this->baseline->generate($issues, $baselineFile);
