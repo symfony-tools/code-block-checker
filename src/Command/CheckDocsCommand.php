@@ -110,7 +110,13 @@ class CheckDocsCommand extends Command
         }
 
         if ($baselineFile = $input->getOption('baseline')) {
-            $issues = $this->baseline->filter($issues, $baselineFile);
+            $json = file_get_contents($baselineFile);
+            try {
+                $baseline = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
+            } catch (\JsonException $e) {
+                throw new \RuntimeException('Could not parse baseline', 0, $e);
+            }
+            $issues = $this->baseline->filter($issues, $baseline);
         }
 
         $issueCount = count($issues);
