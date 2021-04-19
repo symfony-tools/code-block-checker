@@ -36,13 +36,13 @@ class CodeNodeRunner
         }
 
         try {
-            file_put_contents($applicationDirectory . '/' . $file, $this->getNodeContents($node));
+            file_put_contents($applicationDirectory.'/'.$file, $this->getNodeContents($node));
             // Clear cache
-            (new Filesystem())->remove($applicationDirectory . '/var/cache');
+            (new Filesystem())->remove($applicationDirectory.'/var/cache');
             $this->warmupCache($node, $issues, $applicationDirectory);
         } finally {
             // Remove the file we added
-            (new Filesystem())->remove($applicationDirectory . '/' . $file);
+            (new Filesystem())->remove($applicationDirectory.'/'.$file);
         }
     }
 
@@ -58,7 +58,7 @@ class CodeNodeRunner
         foreach (explode(PHP_EOL, $process->getErrorOutput()) as $line) {
             $line = trim($line);
             if ('' !== $line) {
-                $error.=$line.PHP_EOL;
+                $error .= $line.PHP_EOL;
             }
         }
 
@@ -68,7 +68,7 @@ class CodeNodeRunner
     private function getFile(CodeNode $node): string
     {
         $contents = explode(PHP_EOL, $node->getValue());
-        $regex = match($node->getLanguage()) {
+        $regex = match ($node->getLanguage()) {
             'php' => '|^// ?([a-z1-9A-Z_\-/]+\.php)$|',
             'yaml' => '|^# ?([a-z1-9A-Z_\-/]+\.yaml)$|',
             //'xml' => '|^<!-- ?([a-z1-9A-Z_\-/]+\.xml) ?-->$|',
@@ -85,13 +85,14 @@ class CodeNodeRunner
     private function getNodeContents(CodeNode $node): string
     {
         $language = $node->getLanguage();
-        if ($language === 'php') {
-             return '<?php' . PHP_EOL. $node->getValue();
+        if ('php' === $language) {
+            return '<?php'.PHP_EOL.$node->getValue();
         }
 
-        if ($language === 'xml') {
+        if ('xml' === $language) {
             $contents = explode(PHP_EOL, $node->getValue());
             unset($contents[0]);
+
             return implode(PHP_EOL, $contents);
         }
 
