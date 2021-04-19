@@ -5,10 +5,7 @@
       <code>\CachedContainer</code>
     </UndefinedClass>
   </file>
-  <file src="src/Service/CodeValidator.php">
-    <InvalidArgument occurrences="3">
-      <code>'bis'</code>
-      <code>'foobar'</code>
-    </InvalidArgument>
+  <file src="src/Service/CodeValidator/XmlValidator.php">
+    <InvalidArgument occurrences="1"/>
   </file>
 </files>
