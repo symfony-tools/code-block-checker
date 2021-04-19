@@ -20,6 +20,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
 use SymfonyDocsBuilder\BuildConfig;
 
 class CheckDocsCommand extends Command
@@ -43,7 +44,7 @@ class CheckDocsCommand extends Command
     {
         $this
             ->addArgument('source-dir', InputArgument::REQUIRED, 'RST files Source directory')
-            ->addArgument('files', InputArgument::IS_ARRAY + InputArgument::REQUIRED, 'RST files that should be verified.')
+            ->addArgument('files', InputArgument::IS_ARRAY, 'RST files that should be verified.', [])
             ->addOption('output-format', null, InputOption::VALUE_REQUIRED, 'Valid options are github and console', 'github')
             ->addOption('generate-baseline', null, InputOption::VALUE_REQUIRED, 'Generate a new baseline', false)
             ->addOption('baseline', null, InputOption::VALUE_REQUIRED, 'Use a baseline', false)
@@ -77,6 +78,10 @@ class CheckDocsCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $files = $input->getArgument('files');
+        if ([] === $files) {
+            $files = $this->findFiles($input->getArgument('source-dir'));
+        }
+
         $parseQueue = new ParseQueue();
         foreach ($files as $filename) {
             // Remove ".rst"
@@ -120,5 +125,18 @@ class CheckDocsCommand extends Command
         $this->io->success('Build completed successfully!');
 
         return Command::SUCCESS;
+    }
+
+    private function findFiles(string $directory): array
+    {
+        $files = [];
+        $finder = new Finder();
+        $finder->in($directory)
+            ->name('*.rst');
+        foreach ($finder as $file) {
+            $files[] = $file->getRelativePathname();
+        }
+
+        return $files;
     }
 }
