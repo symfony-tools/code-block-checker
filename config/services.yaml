@@ -8,8 +8,16 @@ services:
         bind:
           string $cacheDir: '%kernel.cache_dir%'
 
+    _instanceof:
+        Symfony\CodeBlockChecker\Service\CodeValidator\Validator:
+            tags:
+                - 'app.code_validator'
+
     Symfony\CodeBlockChecker\:
         resource: '../src/'
         exclude:
             - '../src/Kernel.php'
             - '../src/Application.php'
+
+    Symfony\CodeBlockChecker\Service\CodeValidator:
+        arguments: [!tagged_iterator app.code_validator]
