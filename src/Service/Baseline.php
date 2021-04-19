@@ -27,16 +27,9 @@ class Baseline
     /**
      * Remove items from $issues that are in the baseline.
      */
-    public function filter(IssueCollection $issues, string $file): IssueCollection
+    public function filter(IssueCollection $issues, array $baseline): IssueCollection
     {
-        $json = file_get_contents($file);
-        try {
-            $baseline = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
-            $baseline = $baseline['issues'];
-        } catch (\JsonException $e) {
-            throw new \RuntimeException('Could not parse baseline', 0, $e);
-        }
-
+        $baseline = $baseline['issues'];
         $output = new IssueCollection();
         $perFile = [];
         foreach ($issues as $issue) {
@@ -59,13 +52,14 @@ class Baseline
                     if (
                         $issue->getType() === $item['type'] &&
                         $issue->getText() === $item['text'] &&
-                        $issue->getErroredLine()() === $item['code']
+                        $issue->getErroredLine() === $item['code']
                     ) {
                         unset($fileBaseline[$i]);
-                    } else {
-                        $output->addIssue($issue);
+                        continue 2;
                     }
                 }
+
+                $output->addIssue($issue);
             }
         }
 

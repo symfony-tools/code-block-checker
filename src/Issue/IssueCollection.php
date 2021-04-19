@@ -52,4 +52,9 @@ class IssueCollection implements \Iterator, \Countable
     {
         return $this->issues[0] ?? null;
     }
+
+    public function append(IssueCollection $collection)
+    {
+        $this->issues = array_merge($this->issues, $collection->issues);
+    }
 }
