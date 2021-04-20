@@ -56,7 +56,7 @@ class Issue implements \Stringable
 
     public function getFile(): string
     {
-        return $this->file;
+        return $this->file.'.rst';
     }
 
     public function getLine(): int
