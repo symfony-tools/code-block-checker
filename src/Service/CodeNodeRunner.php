@@ -31,7 +31,7 @@ class CodeNodeRunner
     private function processNode(CodeNode $node, IssueCollection $issues, string $applicationDirectory): void
     {
         $file = $this->getFile($node);
-        if ('config/' !== substr($file, 0, 7)) {
+        if ('config/packages/' !== substr($file, 0, 7)) {
             return;
         }
 
