@@ -55,6 +55,8 @@ class DummyExtension extends AbstractExtension
             new TwigFunction('workflow_marked_places'),
             new TwigFunction('workflow_metadata'),
             new TwigFunction('workflow_transition_blockers'),
+            new TwigFunction('encore_entry_link_tags'),
+            new TwigFunction('encore_entry_script_tags'),
         ];
     }
 
@@ -77,6 +79,9 @@ class DummyExtension extends AbstractExtension
             new TwigFilter('yaml_dump'),
             new TwigFilter('trans'),
             new TwigFilter('transchoice'),
+            new TwigFilter('inline_css'),
+            new TwigFilter('markdown_to_html'),
+            new TwigFilter('inky_to_html'),
         ];
     }
 }
