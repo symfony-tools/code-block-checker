@@ -18,7 +18,7 @@ class PhpValidator implements Validator
 
         $file = sys_get_temp_dir().'/'.uniqid('doc_builder', true).'.php';
         $contents = $node->getValue();
-        if (!preg_match('#class [a-zA-Z]+#s', $contents) && preg_match('#(public|protected|private) (\$[a-z]+|function)#s', $contents)) {
+        if (!preg_match('#(class|interface) [a-zA-Z]+#s', $contents) && preg_match('#(public|protected|private)( static)? (\$[a-z]+|function)#s', $contents)) {
             $contents = 'class Foobar {'.$contents.'}';
         }
 
