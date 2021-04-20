@@ -31,7 +31,7 @@ class TwigValidator implements Validator
             // We cannot parse the TokenStream because we dont have all extensions loaded.
             $this->twig->parse($tokens);
         } catch (SyntaxError $e) {
-            $issues->addIssue(new Issue($node, $e->getMessage(), 'Invalid syntax', $node->getEnvironment()->getCurrentFileName(), 0));
+            $issues->addIssue(new Issue($node, $e->getRawMessage(), 'Twig', $node->getEnvironment()->getCurrentFileName(), $e->getTemplateLine()));
         }
     }
 }
