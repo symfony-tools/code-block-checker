@@ -77,6 +77,9 @@ class DummyExtension extends AbstractExtension
             new TwigFilter('yaml_dump'),
             new TwigFilter('trans'),
             new TwigFilter('transchoice'),
+            new TwigFilter('inline_css'),
+            new TwigFilter('markdown_to_html'),
+            new TwigFilter('inky_to_html'),
         ];
     }
 }
