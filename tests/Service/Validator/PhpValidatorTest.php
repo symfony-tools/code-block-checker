@@ -9,7 +9,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\CodeBlockChecker\Issue\IssueCollection;
 use Symfony\CodeBlockChecker\Service\CodeValidator\PhpValidator;
 use Symfony\CodeBlockChecker\Service\CodeValidator\Validator;
-use Symfony\CodeBlockChecker\Service\CodeValidator\YamlValidator;
 
 class PhpValidatorTest extends TestCase
 {
