@@ -54,15 +54,7 @@ class CodeNodeRunner
             return;
         }
 
-        $error = '';
-        foreach (explode(PHP_EOL, $process->getErrorOutput()) as $line) {
-            $line = trim($line);
-            if ('' !== $line) {
-                $error .= $line.PHP_EOL;
-            }
-        }
-
-        $issues->addIssue(new Issue($node, trim($error), 'Cache Warmup', $node->getEnvironment()->getCurrentFileName(), count(explode(PHP_EOL, $node->getValue())) - 1));
+        $issues->addIssue(new Issue($node, trim($process->getErrorOutput()), 'Cache Warmup', $node->getEnvironment()->getCurrentFileName(), count(explode(PHP_EOL, $node->getValue())) - 1));
     }
 
     private function getFile(CodeNode $node): string
