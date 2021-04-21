@@ -10,6 +10,7 @@ use Doctrine\RST\Builder\ParseQueueProcessor;
 use Doctrine\RST\ErrorManager;
 use Doctrine\RST\Event\PostNodeCreateEvent;
 use Doctrine\RST\Meta\Metas;
+use Symfony\CodeBlockChecker\Issue\IssueCollection;
 use Symfony\CodeBlockChecker\Listener\CodeNodeCollector;
 use Symfony\CodeBlockChecker\Service\Baseline;
 use Symfony\CodeBlockChecker\Service\CodeNodeRunner;
@@ -81,22 +82,9 @@ class CheckDocsCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $files = $input->getArgument('files');
-        if ([] === $files) {
-            $files = $this->findFiles($input->getArgument('source-dir'));
-        }
-
-        $parseQueue = new ParseQueue();
-        foreach ($files as $filename) {
-            // Remove ".rst"
-            if ('.rst' === substr($filename, -4)) {
-                $filename = substr($filename, 0, -4);
-            }
-            $parseQueue->addFile(ltrim($filename, '/'), true);
-        }
-
         // This will collect all CodeNodes
-        $this->queueProcessor->process($parseQueue);
+        $this->queueProcessor->process($this->prepareParseQueue($input));
+
         // Verify code blocks
         $issues = $this->validator->validateNodes($this->collector->getNodes());
         if ($applicationDir = $input->getOption('symfony-application')) {
@@ -119,25 +107,12 @@ class CheckDocsCommand extends Command
             $issues = $this->baseline->filter($issues, $baseline);
         }
 
-        $issueCount = count($issues);
-        if ($issueCount > 0) {
-            $format = $input->getOption('output-format');
-            if ('console' === $format) {
-                foreach ($issues as $issue) {
-                    $this->io->writeln($issue->__toString());
-                }
-
-                $this->io->error(sprintf('Build completed with %s errors', $issueCount));
-            } elseif ('github' === $format) {
-                foreach ($issues as $issue) {
-                    // We use urlencoded '\n'
-                    $text = str_replace(PHP_EOL, '%0A', $issue->getText());
-                    $this->io->writeln(sprintf('::error file=%s,line=%s::[%s] %s', $issue->getFile(), $issue->getLine(), $issue->getType(), $text));
-                }
-            }
+        if (count($issues) > 0) {
+            $this->outputIssue($input->getOption('output-format'), $issues);
 
             return Command::FAILURE;
         }
+
         $this->io->success('Build completed successfully!');
 
         return Command::SUCCESS;
@@ -154,5 +129,58 @@ class CheckDocsCommand extends Command
         }
 
         return $files;
+    }
+
+    private function prepareParseQueue(InputInterface $input): ParseQueue
+    {
+        $sourceDirectory = $input->getArgument('source-dir');
+        $files = $input->getArgument('files');
+        if ([] === $files) {
+            $files = $this->findFiles($sourceDirectory);
+        } else {
+            foreach ($files as $i => $file) {
+                if (!file_exists($sourceDirectory.DIRECTORY_SEPARATOR.$file)) {
+                    unset($files[$i]);
+                    $this->outputWarning($input->getOption('output-format'), sprintf('Could not find file "%s"', $file));
+                }
+            }
+        }
+
+        $parseQueue = new ParseQueue();
+        foreach ($files as $filename) {
+            // Remove ".rst"
+            if ('.rst' === substr($filename, -4)) {
+                $filename = substr($filename, 0, -4);
+            }
+            $parseQueue->addFile(ltrim($filename, '/'), true);
+        }
+
+        return $parseQueue;
+    }
+
+    private function outputWarning(string $format, string $text): void
+    {
+        if ('console' === $format) {
+            $this->io->warning($text);
+        } elseif ('github' === $format) {
+            $this->io->writeln('::warning::'.$text);
+        }
+    }
+
+    private function outputIssue(string $format, IssueCollection $issues): void
+    {
+        if ('console' === $format) {
+            foreach ($issues as $issue) {
+                $this->io->writeln($issue->__toString());
+            }
+
+            $this->io->error(sprintf('Build completed with %s errors', $issues->count()));
+        } elseif ('github' === $format) {
+            foreach ($issues as $issue) {
+                // We use urlencoded '\n'
+                $text = str_replace(PHP_EOL, '%0A', $issue->getText());
+                $this->io->writeln(sprintf('::error file=%s,line=%s::[%s] %s', $issue->getFile(), $issue->getLine(), $issue->getType(), $text));
+            }
+        }
     }
 }
