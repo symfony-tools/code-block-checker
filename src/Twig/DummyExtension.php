@@ -57,6 +57,10 @@ class DummyExtension extends AbstractExtension
             new TwigFunction('workflow_transition_blockers'),
             new TwigFunction('encore_entry_link_tags'),
             new TwigFunction('encore_entry_script_tags'),
+            new TwigFunction('impersonation_exit_path'),
+            new TwigFunction('impersonation_exit_url'),
+            new TwigFunction('workflow_transition'),
+            new TwigFunction('t'),
         ];
     }
 
