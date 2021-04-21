@@ -35,7 +35,7 @@ class CodeNodeRunner
             return;
         }
 
-        $fullPath = $applicationDirectory . '/' . $file;
+        $fullPath = $applicationDirectory.'/'.$file;
         $filesystem = new Filesystem();
         $replacedOriginal = false;
         try {
