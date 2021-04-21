@@ -49,7 +49,7 @@ class XmlValidator implements Validator
         }
 
         if (null !== $error) {
-            $issues->addIssue(new Issue($node, $error->message, 'XML syntax', $node->getEnvironment()->getCurrentFileName(), $error->line + $count));
+            $issues->addIssue(new Issue($node, 'Foo "bar" not foo.'.$error->message, 'XML syntax', $node->getEnvironment()->getCurrentFileName(), $error->line + $count));
         }
     }
 }

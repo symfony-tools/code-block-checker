@@ -178,7 +178,7 @@ class CheckDocsCommand extends Command
         } elseif ('github' === $format) {
             foreach ($issues as $issue) {
                 // We use urlencoded '\n'
-                $text = str_replace(PHP_EOL, '%0A', $issue->getText());
+                $text = urlencode($issue->getText());
                 $this->io->writeln(sprintf('::error file=%s,line=%s::[%s] %s', $issue->getFile(), $issue->getLine(), $issue->getType(), $text));
             }
         }
