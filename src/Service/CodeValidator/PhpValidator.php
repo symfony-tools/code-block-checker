@@ -12,19 +12,13 @@ class PhpValidator implements Validator
     public function validate(CodeNode $node, IssueCollection $issues): void
     {
         $language = $node->getLanguage() ?? ($node->isRaw() ? null : 'php');
-        if (!in_array($language, ['php', 'php-symfony', 'php-standalone', 'php-annotations'])) {
+        if (!in_array($language, ['php', 'php-symfony', 'php-standalone', 'php-annotations', 'html+php'])) {
             return;
         }
 
         $file = sys_get_temp_dir().'/'.uniqid('doc_builder', true).'.php';
-        $contents = $node->getValue();
-        if (!preg_match('#(class|interface) [a-zA-Z]+#s', $contents) && preg_match('#(public|protected|private)( static)? (\$[a-z]+|function)#s', $contents)) {
-            $contents = 'class Foobar {'.$contents.'}';
-        }
 
-        // Allow us to use "..." as a placeholder
-        $contents = str_replace('...', 'null', $contents);
-        file_put_contents($file, '<?php'.PHP_EOL.$contents);
+        file_put_contents($file, $this->getContents($node, $language));
 
         $process = new Process(['php', '-l', $file]);
         $process->run();
@@ -39,5 +33,27 @@ class PhpValidator implements Validator
             $line = ((int) $matches[1]) - 1; // we added "<?php"
         }
         $issues->addIssue(new Issue($node, $text, 'Invalid syntax', $node->getEnvironment()->getCurrentFileName(), $line));
+    }
+
+    private function getContents(CodeNode $node, string $language): string
+    {
+        $contents = $node->getValue();
+        if ('html+php' === $language) {
+            return $contents;
+        }
+
+        if (!preg_match('#(class|interface) [a-zA-Z]+#s', $contents) && preg_match('#(public|protected|private)( static)? (\$[a-z]+|function)#s', $contents)) {
+            $contents = 'class Foobar {'.$contents.'}';
+        }
+
+        // Allow us to use "..." as a placeholder
+        $contents = str_replace('...', 'null', $contents);
+
+        $lines = explode(PHP_EOL, $contents);
+        if (!str_contains('<?php', $lines[0]) && !str_contains('<?php', $lines[1]) && !str_contains('<?php', $lines[2])) {
+            $contents = '<?php'.PHP_EOL.$contents;
+        }
+
+        return $contents;
     }
 }
