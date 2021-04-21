@@ -35,14 +35,30 @@ class CodeNodeRunner
             return;
         }
 
+        $fullPath = $applicationDirectory . '/' . $file;
+        $filesystem = new Filesystem();
+        $replacedOriginal = false;
         try {
-            file_put_contents($applicationDirectory.'/'.$file, $this->getNodeContents($node));
+            if (is_file($fullPath)) {
+                $filesystem->copy($fullPath, $fullPath.'.backup');
+                $replacedOriginal = true;
+            }
+
+            // Write config
+            file_put_contents($fullPath, $this->getNodeContents($node));
+
             // Clear cache
-            (new Filesystem())->remove($applicationDirectory.'/var/cache');
+            $filesystem->remove($applicationDirectory.'/var/cache');
+
+            // Warmup and log errors
             $this->warmupCache($node, $issues, $applicationDirectory);
         } finally {
-            // Remove the file we added
-            (new Filesystem())->remove($applicationDirectory.'/'.$file);
+            // Remove added file and restore original
+            $filesystem->remove($fullPath);
+            if ($replacedOriginal) {
+                $filesystem->copy($fullPath.'.backup', $fullPath);
+                $filesystem->remove($fullPath.'.backup');
+            }
         }
     }
 
