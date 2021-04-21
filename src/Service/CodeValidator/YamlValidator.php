@@ -25,7 +25,7 @@ class YamlValidator implements Validator
                 return;
             }
 
-            $issues->addIssue(new Issue($node, $e->getMessage(), 'Invalid syntax', $node->getEnvironment()->getCurrentFileName(), $e->getParsedLine()));
+            $issues->addIssue(new Issue($node, $e->getMessage(), 'Yaml syntax', $node->getEnvironment()->getCurrentFileName(), $e->getParsedLine()));
         }
     }
 }

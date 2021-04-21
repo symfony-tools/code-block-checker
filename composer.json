@@ -6,6 +6,7 @@
         "php": ">=8.0",
         "ext-ctype": "*",
         "ext-iconv": "*",
+        "ext-libxml": "*",
         "doctrine/rst-parser": "^0.4",
         "symfony/console": "^5.2",
         "symfony/docs-builder": "^0.15.0",
