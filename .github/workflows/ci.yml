@@ -25,4 +25,4 @@ jobs:
         run: ./vendor/bin/phpunit
 
       - name: Run demo
-        run: php bin/console cache:clear
+        run: php code-block-checker.php cache:clear
