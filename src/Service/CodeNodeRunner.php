@@ -62,7 +62,7 @@ class CodeNodeRunner
             }
         }
 
-        $issues->addIssue(new Issue($node, trim($error), 'Cache Warmup', $node->getEnvironment()->getCurrentFileName(), count(explode(PHP_EOL, $node->getValue()))));
+        $issues->addIssue(new Issue($node, trim($error), 'Cache Warmup', $node->getEnvironment()->getCurrentFileName(), count(explode(PHP_EOL, $node->getValue())) - 1));
     }
 
     private function getFile(CodeNode $node): string
