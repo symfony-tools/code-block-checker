@@ -107,11 +107,12 @@ class CheckDocsCommand extends Command
             $issues = $this->baseline->filter($issues, $baseline);
         }
 
-        if ( count($issues) > 0) {
+        if (count($issues) > 0) {
             $this->outputIssue($input->getOption('output-format'), $issues);
 
             return Command::FAILURE;
         }
+
         $this->io->success('Build completed successfully!');
 
         return Command::SUCCESS;
@@ -165,7 +166,6 @@ class CheckDocsCommand extends Command
             $this->io->writeln('::warning::'.$text);
         }
     }
-
 
     private function outputIssue(string $format, IssueCollection $issues): void
     {

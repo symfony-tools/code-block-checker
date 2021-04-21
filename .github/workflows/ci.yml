@@ -23,6 +23,3 @@ jobs:
 
       - name: Run tests
         run: ./vendor/bin/phpunit
-
-      - name: Run demo
-        run: echo "::warning::Missing semicolon"
