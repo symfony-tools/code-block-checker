@@ -31,7 +31,7 @@ class CacheClearCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln('::error file=README.md,line=7::[XML syntax] Foo "bar" not foo.Unescaped < not allowed in attributes values');
+        $output->writeln('::error file=README.md,line=7::[PHP syntax] PHP Parse error:  syntax error, unexpected token "}"');
         //(new Filesystem())->remove($this->cacheDirectory);
 
         return 0;
