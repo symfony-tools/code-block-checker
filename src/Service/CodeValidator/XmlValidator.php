@@ -48,7 +48,7 @@ class XmlValidator implements Validator
             break;
         }
 
-        if ($error !== null) {
+        if (null !== $error) {
             $issues->addIssue(new Issue($node, $error->message, 'XML syntax', $node->getEnvironment()->getCurrentFileName(), $error->line + $count));
         }
     }
