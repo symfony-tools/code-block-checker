@@ -14,7 +14,7 @@ use Doctrine\RST\Nodes\CodeNode;
  */
 class CodeNodeCollector
 {
-    private array $nodes;
+    private array $nodes = [];
 
     public function getNodes(): array
     {
