@@ -32,7 +32,7 @@ class PhpValidator implements Validator
             $text = str_replace($matches[0], '', $text);
             $line = ((int) $matches[1]) - 1; // we added "<?php"
         }
-        $issues->addIssue(new Issue($node, $text, 'Invalid syntax', $node->getEnvironment()->getCurrentFileName(), $line));
+        $issues->addIssue(new Issue($node, $text, 'PHP syntax', $node->getEnvironment()->getCurrentFileName(), $line));
     }
 
     private function getContents(CodeNode $node, string $language): string

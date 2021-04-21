@@ -17,7 +17,7 @@ class JsonValidator implements Validator
         try {
             $data = json_decode($node->getValue(), true, 512, JSON_THROW_ON_ERROR);
         } catch (\JsonException $e) {
-            $issues->addIssue(new Issue($node, $e->getMessage(), 'Invalid syntax', $node->getEnvironment()->getCurrentFileName(), 0));
+            $issues->addIssue(new Issue($node, $e->getMessage(), 'JSON syntax', $node->getEnvironment()->getCurrentFileName(), 0));
         }
     }
 }
