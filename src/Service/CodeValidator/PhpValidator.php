@@ -50,7 +50,7 @@ class PhpValidator implements Validator
         $contents = str_replace('...', 'null', $contents);
 
         $lines = explode(PHP_EOL, $contents);
-        if (!str_contains('<?php', $lines[0]) && !str_contains('<?php', $lines[1]) && !str_contains('<?php', $lines[2])) {
+        if (!str_contains($lines[0] ?? '', '<?php') && !str_contains($lines[1] ?? '', '<?php') && !str_contains($lines[2] ?? '', '<?php')) {
             $contents = '<?php'.PHP_EOL.$contents;
         }
 
