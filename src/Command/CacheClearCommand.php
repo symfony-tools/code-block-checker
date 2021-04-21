@@ -31,7 +31,8 @@ class CacheClearCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        (new Filesystem())->remove($this->cacheDirectory);
+        $output->writeln('::error file=README.md,line=7::[XML syntax] Foo "bar" not foo.Unescaped < not allowed in attributes values');
+        //(new Filesystem())->remove($this->cacheDirectory);
 
         return 0;
     }

@@ -25,4 +25,4 @@ jobs:
         run: ./vendor/bin/phpunit
 
       - name: Run demo
-        run: echo "::error file=README.md,line=7::[XML syntax] Foo+%22bar%22+not+foo.Unescaped+%27%3C%27+not+allowed+in+attributes+values"
+        run: php bin/console cache:clear
