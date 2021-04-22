@@ -1,5 +1,5 @@
 {
-    "name": "symfony/code-block-checker",
+    "name": "symfony-tools/code-block-checker",
     "type": "project",
     "license": "proprietary",
     "require": {
