@@ -22,8 +22,8 @@ class LineDetector
         }
 
         $file = sprintf('%s/%s.rst', $environment->getCurrentDirectory(), $environment->getCurrentFileName());
-        $contents = explode(PHP_EOL, file_get_contents($file));
-        $codeBlock = explode(PHP_EOL, $node->getValue());
+        $contents = explode("\n", file_get_contents($file));
+        $codeBlock = explode("\n", $node->getValue());
 
         foreach ($contents as $i => $line) {
             foreach ($codeBlock as $j => $needle) {
