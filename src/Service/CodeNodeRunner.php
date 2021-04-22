@@ -70,12 +70,12 @@ class CodeNodeRunner
             return;
         }
 
-        $issues->addIssue(new Issue($node, trim($process->getErrorOutput()), 'Cache Warmup', $node->getEnvironment()->getCurrentFileName(), count(explode(PHP_EOL, $node->getValue())) - 1));
+        $issues->addIssue(new Issue($node, trim($process->getErrorOutput()), 'Cache Warmup', $node->getEnvironment()->getCurrentFileName(), count(explode("\n", $node->getValue())) - 1));
     }
 
     private function getFile(CodeNode $node): string
     {
-        $contents = explode(PHP_EOL, $node->getValue());
+        $contents = explode("\n", $node->getValue());
         $regex = match ($node->getLanguage()) {
             'php' => '|^// ?([a-z1-9A-Z_\-/]+\.php)$|',
             'yaml' => '|^# ?([a-z1-9A-Z_\-/]+\.yaml)$|',
@@ -94,14 +94,14 @@ class CodeNodeRunner
     {
         $language = $node->getLanguage();
         if ('php' === $language) {
-            return '<?php'.PHP_EOL.$node->getValue();
+            return '<?php'."\n".$node->getValue();
         }
 
         if ('xml' === $language) {
-            $contents = explode(PHP_EOL, $node->getValue());
+            $contents = explode("\n", $node->getValue());
             unset($contents[0]);
 
-            return implode(PHP_EOL, $contents);
+            return implode("\n", $contents);
         }
 
         return $node->getValue();

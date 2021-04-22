@@ -47,11 +47,11 @@ class PhpValidator implements Validator
         }
 
         // Allow us to use "..." as a placeholder
-        $contents = str_replace('...', 'null', $contents);
+        $contents = str_replace(['...,', '...)', '...;'], ['null,', 'null)', 'null;'], $contents);
 
-        $lines = explode(PHP_EOL, $contents);
+        $lines = explode("\n", $contents);
         if (!str_contains($lines[0] ?? '', '<?php') && !str_contains($lines[1] ?? '', '<?php') && !str_contains($lines[2] ?? '', '<?php')) {
-            $contents = '<?php'.PHP_EOL.$contents;
+            $contents = '<?php'."\n".$contents;
         }
 
         return $contents;
