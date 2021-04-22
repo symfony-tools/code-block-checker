@@ -7,7 +7,6 @@ jobs:
   phpstan:
     name: PHPStan
     runs-on: Ubuntu-20.04
-    continue-on-error: true
 
     steps:
       - name: Checkout code
@@ -40,7 +39,6 @@ jobs:
   php-cs-fixer:
     name: PHP-CS-Fixer
     runs-on: Ubuntu-20.04
-    continue-on-error: true
 
     steps:
       - name: Checkout code
@@ -73,7 +71,6 @@ jobs:
   psalm:
     name: Psalm
     runs-on: Ubuntu-20.04
-    continue-on-error: true
 
     steps:
       - name: Checkout code
@@ -106,7 +103,6 @@ jobs:
   composer-normalize:
     name: Composer Normalize
     runs-on: Ubuntu-20.04
-    continue-on-error: true
 
     steps:
       - name: Set up PHP
