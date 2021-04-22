@@ -148,11 +148,12 @@ class CheckDocsCommand extends Command
 
         $parseQueue = new ParseQueue();
         foreach ($files as $filename) {
-            // Remove ".rst"
+            // Only parse .rst files
             if ('.rst' === substr($filename, -4)) {
+                // Remove ".rst"
                 $filename = substr($filename, 0, -4);
+                $parseQueue->addFile(ltrim($filename, '/'), true);
             }
-            $parseQueue->addFile(ltrim($filename, '/'), true);
         }
 
         return $parseQueue;
