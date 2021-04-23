@@ -4,8 +4,8 @@
 
 require __DIR__.'/vendor/autoload.php';
 
-use Symfony\CodeBlockChecker\Application;
-use Symfony\CodeBlockChecker\Kernel;
+use SymfonyTools\CodeBlockChecker\Application;
+use SymfonyTools\CodeBlockChecker\Kernel;
 use Symfony\Component\Console\Input\ArgvInput;
 
 $input = new ArgvInput();

@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\CodeBlockChecker\Service;
+namespace SymfonyTools\CodeBlockChecker\Service;
 
 use Doctrine\RST\Nodes\CodeNode;
 

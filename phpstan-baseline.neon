@@ -6,7 +6,7 @@ parameters:
 			path: src/Kernel.php
 
 		-
-			message: "#^Property Symfony\\\\CodeBlockChecker\\\\Kernel\\:\\:\\$container \\(Symfony\\\\Component\\\\DependencyInjection\\\\Container\\) does not accept CachedContainer\\.$#"
+			message: "#^Property SymfonyTools\\\\CodeBlockChecker\\\\Kernel\\:\\:\\$container \\(Symfony\\\\Component\\\\DependencyInjection\\\\Container\\) does not accept CachedContainer\\.$#"
 			count: 1
 			path: src/Kernel.php
 

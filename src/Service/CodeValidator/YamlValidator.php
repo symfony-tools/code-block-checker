@@ -1,12 +1,12 @@
 <?php
 
-namespace Symfony\CodeBlockChecker\Service\CodeValidator;
+namespace SymfonyTools\CodeBlockChecker\Service\CodeValidator;
 
 use Doctrine\RST\Nodes\CodeNode;
-use Symfony\CodeBlockChecker\Issue\Issue;
-use Symfony\CodeBlockChecker\Issue\IssueCollection;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
+use SymfonyTools\CodeBlockChecker\Issue\Issue;
+use SymfonyTools\CodeBlockChecker\Issue\IssueCollection;
 
 class YamlValidator implements Validator
 {

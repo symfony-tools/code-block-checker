@@ -1,9 +1,9 @@
 <?php
 
-namespace Symfony\CodeBlockChecker\Issue;
+namespace SymfonyTools\CodeBlockChecker\Issue;
 
 use Doctrine\RST\Nodes\CodeNode;
-use Symfony\CodeBlockChecker\Service\LineDetector;
+use SymfonyTools\CodeBlockChecker\Service\LineDetector;
 
 /**
  * Represent an error with some code.
