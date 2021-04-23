@@ -10,8 +10,9 @@ services:
 
     _instanceof:
         SymfonyTools\CodeBlockChecker\Service\CodeValidator\Validator:
-            tags:
-                - 'app.code_validator'
+            tags: ['app.code_validator']
+        SymfonyTools\CodeBlockChecker\Service\CodeRunner\Runner:
+            tags: ['app.code_runner']
 
     SymfonyTools\CodeBlockChecker\:
         resource: '../src/'
@@ -21,3 +22,6 @@ services:
 
     SymfonyTools\CodeBlockChecker\Service\CodeValidator:
         arguments: [!tagged_iterator app.code_validator]
+
+    SymfonyTools\CodeBlockChecker\Service\CodeRunner:
+        arguments: [!tagged_iterator app.code_runner]

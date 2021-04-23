@@ -53,7 +53,7 @@
     "repositories": [
         {
             "type": "git",
-            "url": "https://github.com/weaverryan/docs-builder"
+            "url": "https://github.com/symfony-tools/docs-builder"
         }
     ],
     "minimum-stability": "dev",

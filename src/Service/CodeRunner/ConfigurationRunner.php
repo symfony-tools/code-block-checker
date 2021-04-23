@@ -1,6 +1,6 @@
 <?php
 
-namespace SymfonyTools\CodeBlockChecker\Service;
+namespace SymfonyTools\CodeBlockChecker\Service\CodeRunner;
 
 use Doctrine\RST\Nodes\CodeNode;
 use Symfony\Component\Filesystem\Filesystem;
@@ -13,24 +13,23 @@ use SymfonyTools\CodeBlockChecker\Issue\IssueCollection;
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class CodeNodeRunner
+class ConfigurationRunner
 {
     /**
      * @param list<CodeNode> $nodes
      */
-    public function runNodes(array $nodes, string $applicationDirectory): IssueCollection
+    public function run(array $nodes, IssueCollection $issues, string $applicationDirectory): void
     {
-        $issues = new IssueCollection();
         foreach ($nodes as $node) {
             $this->processNode($node, $issues, $applicationDirectory);
         }
-
-        return $issues;
     }
 
     private function processNode(CodeNode $node, IssueCollection $issues, string $applicationDirectory): void
     {
-        $file = $this->getFile($node);
+        $explodedNode = explode("\n", $node->getValue());
+        $file = $this->getFile($node, $explodedNode);
+
         if ('config/packages/' !== substr($file, 0, 16)) {
             return;
         }
@@ -45,13 +44,13 @@ class CodeNodeRunner
             }
 
             // Write config
-            file_put_contents($fullPath, $this->getNodeContents($node));
+            file_put_contents($fullPath, $this->getNodeContents($node, $explodedNode));
 
             // Clear cache
             $filesystem->remove($applicationDirectory.'/var/cache');
 
             // Warmup and log errors
-            $this->warmupCache($node, $issues, $applicationDirectory);
+            $this->warmupCache($node, $issues, $applicationDirectory, count($explodedNode) - 1);
         } finally {
             // Remove added file and restore original
             $filesystem->remove($fullPath);
@@ -62,7 +61,7 @@ class CodeNodeRunner
         }
     }
 
-    private function warmupCache(CodeNode $node, IssueCollection $issues, string $applicationDirectory): void
+    private function warmupCache(CodeNode $node, IssueCollection $issues, string $applicationDirectory, int $numberOfLines): void
     {
         $process = new Process(['php', 'bin/console', 'cache:warmup', '--env', 'dev'], $applicationDirectory);
         $process->run();
@@ -70,12 +69,11 @@ class CodeNodeRunner
             return;
         }
 
-        $issues->addIssue(new Issue($node, trim($process->getErrorOutput()), 'Cache Warmup', $node->getEnvironment()->getCurrentFileName(), count(explode("\n", $node->getValue())) - 1));
+        $issues->addIssue(new Issue($node, trim($process->getErrorOutput()), 'Cache Warmup', $node->getEnvironment()->getCurrentFileName(), $numberOfLines));
     }
 
-    private function getFile(CodeNode $node): string
+    private function getFile(CodeNode $node, array $contents): string
     {
-        $contents = explode("\n", $node->getValue());
         $regex = match ($node->getLanguage()) {
             'php' => '|^// ?([a-z1-9A-Z_\-/]+\.php)$|',
             'yaml' => '|^# ?([a-z1-9A-Z_\-/]+\.yaml)$|',
@@ -90,7 +88,7 @@ class CodeNodeRunner
         return $matches[1];
     }
 
-    private function getNodeContents(CodeNode $node): string
+    private function getNodeContents(CodeNode $node, array $contents): string
     {
         $language = $node->getLanguage();
         if ('php' === $language) {
@@ -98,12 +96,9 @@ class CodeNodeRunner
         }
 
         if ('xml' === $language) {
-            $contents = explode("\n", $node->getValue());
             unset($contents[0]);
-
-            return implode("\n", $contents);
         }
 
-        return $node->getValue();
+        return implode("\n", $contents);
     }
 }
