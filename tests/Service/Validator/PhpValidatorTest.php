@@ -21,16 +21,47 @@ class PhpValidatorTest extends TestCase
         $this->validator = new PhpValidator();
     }
 
-    /**
-     * @dataProvider getCodeExamples
-     */
-    public function testCodeExamples(int $errors, string $code)
+    public function testLocalLine()
     {
+        // Without <?php
+        $code = '$x = 2;
+$y = 3;
+$z = 4
+echo "foo";
+';
+
         $node = new CodeNode(explode(PHP_EOL, $code));
         $node->setEnvironment($this->environment);
         $node->setLanguage('php');
-        $issues = new IssueCollection();
-        $this->validator->validate($node, $issues);
+        $this->validator->validate($node, $issues = new IssueCollection());
+        $this->assertCount(1, $issues);
+        $this->assertEquals(4, $issues->first()->getLocalLine());
+
+        // With <?php
+        $code = '<?php
+$x = 2;
+$y = 3;
+$z = 4
+echo "foo";
+';
+
+        $node = new CodeNode(explode(PHP_EOL, $code));
+        $node->setEnvironment($this->environment);
+        $node->setLanguage('php');
+        $this->validator->validate($node, $issues = new IssueCollection());
+        $this->assertCount(1, $issues);
+        $this->assertEquals(5, $issues->first()->getLocalLine());
+    }
+
+    /**
+     * @dataProvider getCodeExamples
+     */
+    public function testCodeExamples(int $errors, string $code, ?string $language = null)
+    {
+        $node = new CodeNode(explode(PHP_EOL, $code));
+        $node->setEnvironment($this->environment);
+        $node->setLanguage($language ?? 'php');
+        $this->validator->validate($node, $issues = new IssueCollection());
         $this->assertCount($errors, $issues);
     }
 
@@ -70,5 +101,20 @@ public static function validate($object, ExecutionContextInterface $context, $pa
     }
 }
 '];
+        yield [1, '
+public static function validate($object, ExecutionContextInterface $context, $payload)
+{
+    $foo = 2a
+}
+'];
+        yield [0, '
+<h1>Hello</h1>
+<p><? echo $value; ?></p>
+', 'html+php'];
+
+        yield [1, '
+<h1>Hello</h1>
+<p><?php value foobar ?></p>
+', 'html+php'];
     }
 }
