@@ -3,9 +3,9 @@
 namespace SymfonyTools\CodeBlockChecker\Service\CodeRunner;
 
 use Doctrine\RST\Nodes\CodeNode;
+use Symfony\Component\Process\Process;
 use SymfonyTools\CodeBlockChecker\Issue\Issue;
 use SymfonyTools\CodeBlockChecker\Issue\IssueCollection;
-use Symfony\Component\Process\Process;
 
 /**
  * Verify that any reference to a PHP class is actually a real class.
