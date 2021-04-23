@@ -1,8 +1,6 @@
 <?php
 
-
 namespace SymfonyTools\CodeBlockChecker\Tests\Service\CodeRunner;
-
 
 use Doctrine\RST\Configuration;
 use Doctrine\RST\Environment;
@@ -10,8 +8,6 @@ use Doctrine\RST\Nodes\CodeNode;
 use SymfonyTools\CodeBlockChecker\Issue\IssueCollection;
 use SymfonyTools\CodeBlockChecker\Service\CodeRunner\ClassExist;
 use SymfonyTools\CodeBlockChecker\Service\CodeRunner\Runner;
-use SymfonyTools\CodeBlockChecker\Service\CodeValidator\PhpValidator;
-use SymfonyTools\CodeBlockChecker\Service\CodeValidator\Validator;
 
 class ClassExistTest extends BaseCodeRunnerTest
 {
@@ -23,6 +19,7 @@ class ClassExistTest extends BaseCodeRunnerTest
         $this->environment = new Environment(new Configuration());
         $this->runner = new ClassExist();
     }
+
     public function testHappyPath()
     {
         $code = '
@@ -42,6 +39,4 @@ echo "hello";
         $issue = $issues->first();
         $this->assertStringContainsString('Foo\Bar\Baz', $issue->getText());
     }
-
-
 }
