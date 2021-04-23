@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SymfonyTools\CodeBlockChecker\Service;
 
+use Doctrine\RST\Nodes\CodeNode;
 use SymfonyTools\CodeBlockChecker\Issue\IssueCollection;
 use SymfonyTools\CodeBlockChecker\Service\CodeValidator\Validator;
 
@@ -27,6 +28,9 @@ class CodeValidator
         $this->validators = $validators;
     }
 
+    /**
+     * @param list<CodeNode> $nodes
+     */
     public function validateNodes(array $nodes): IssueCollection
     {
         $issues = new IssueCollection();

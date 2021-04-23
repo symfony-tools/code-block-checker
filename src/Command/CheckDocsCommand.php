@@ -34,14 +34,14 @@ class CheckDocsCommand extends Command
     private CodeNodeCollector $collector;
     private CodeValidator $validator;
     private Baseline $baseline;
-    private CodeNodeRunner $codeNodeRunner;
+    private CodeRunner $codeRunner;
 
-    public function __construct(CodeValidator $validator, Baseline $baseline, CodeNodeRunner $codeNodeRunner)
+    public function __construct(CodeValidator $validator, Baseline $baseline, CodeRunner $codeRunner)
     {
         parent::__construct(self::$defaultName);
         $this->validator = $validator;
         $this->baseline = $baseline;
-        $this->codeNodeRunner = $codeNodeRunner;
+        $this->codeRunner = $codeRunner;
     }
 
     protected function configure()
@@ -88,7 +88,7 @@ class CheckDocsCommand extends Command
         // Verify code blocks
         $issues = $this->validator->validateNodes($this->collector->getNodes());
         if ($applicationDir = $input->getOption('symfony-application')) {
-            $issues->append($this->codeNodeRunner->runNodes($this->collector->getNodes(), $applicationDir));
+            $issues->append($this->codeRunner->runNodes($this->collector->getNodes(), $applicationDir));
         }
 
         if ($baselineFile = $input->getOption('generate-baseline')) {
