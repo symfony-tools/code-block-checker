@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Symfony\CodeBlockChecker\Listener;
+namespace SymfonyTools\CodeBlockChecker\Listener;
 
 use Doctrine\RST\Event\PostNodeCreateEvent;
 use Doctrine\RST\Nodes\CodeNode;

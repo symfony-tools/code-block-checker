@@ -1,11 +1,11 @@
 <?php
 
-namespace Symfony\CodeBlockChecker\Service\CodeValidator;
+namespace SymfonyTools\CodeBlockChecker\Service\CodeValidator;
 
 use Doctrine\RST\Nodes\CodeNode;
-use Symfony\CodeBlockChecker\Issue\Issue;
-use Symfony\CodeBlockChecker\Issue\IssueCollection;
-use Symfony\CodeBlockChecker\Twig\DummyExtension;
+use SymfonyTools\CodeBlockChecker\Issue\Issue;
+use SymfonyTools\CodeBlockChecker\Issue\IssueCollection;
+use SymfonyTools\CodeBlockChecker\Twig\DummyExtension;
 use Twig\Environment;
 use Twig\Error\SyntaxError;
 use Twig\Loader\ArrayLoader;

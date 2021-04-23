@@ -1,14 +1,14 @@
 <?php
 
-namespace Symfony\CodeBlockChecker\Tests\Service\Validator;
+namespace SymfonyTools\CodeBlockChecker\Tests\Service\Validator;
 
 use Doctrine\RST\Configuration;
 use Doctrine\RST\Environment;
 use Doctrine\RST\Nodes\CodeNode;
 use PHPUnit\Framework\TestCase;
-use Symfony\CodeBlockChecker\Issue\IssueCollection;
-use Symfony\CodeBlockChecker\Service\CodeValidator\Validator;
-use Symfony\CodeBlockChecker\Service\CodeValidator\YamlValidator;
+use SymfonyTools\CodeBlockChecker\Issue\IssueCollection;
+use SymfonyTools\CodeBlockChecker\Service\CodeValidator\Validator;
+use SymfonyTools\CodeBlockChecker\Service\CodeValidator\YamlValidator;
 
 class YamlValidatorTest extends TestCase
 {

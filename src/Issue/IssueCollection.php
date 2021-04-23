@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\CodeBlockChecker\Issue;
+namespace SymfonyTools\CodeBlockChecker\Issue;
 
 class IssueCollection implements \Iterator, \Countable
 {

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Symfony\CodeBlockChecker\Command;
+namespace SymfonyTools\CodeBlockChecker\Command;
 
 use Doctrine\RST\Builder\Documents;
 use Doctrine\RST\Builder\ParseQueue;
@@ -10,11 +10,6 @@ use Doctrine\RST\Builder\ParseQueueProcessor;
 use Doctrine\RST\ErrorManager;
 use Doctrine\RST\Event\PostNodeCreateEvent;
 use Doctrine\RST\Meta\Metas;
-use Symfony\CodeBlockChecker\Issue\IssueCollection;
-use Symfony\CodeBlockChecker\Listener\CodeNodeCollector;
-use Symfony\CodeBlockChecker\Service\Baseline;
-use Symfony\CodeBlockChecker\Service\CodeNodeRunner;
-use Symfony\CodeBlockChecker\Service\CodeValidator;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -24,6 +19,11 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use SymfonyDocsBuilder\BuildConfig;
+use SymfonyTools\CodeBlockChecker\Issue\IssueCollection;
+use SymfonyTools\CodeBlockChecker\Listener\CodeNodeCollector;
+use SymfonyTools\CodeBlockChecker\Service\Baseline;
+use SymfonyTools\CodeBlockChecker\Service\CodeNodeRunner;
+use SymfonyTools\CodeBlockChecker\Service\CodeValidator;
 
 class CheckDocsCommand extends Command
 {

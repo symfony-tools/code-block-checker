@@ -9,15 +9,15 @@ services:
           string $cacheDir: '%kernel.cache_dir%'
 
     _instanceof:
-        Symfony\CodeBlockChecker\Service\CodeValidator\Validator:
+        SymfonyTools\CodeBlockChecker\Service\CodeValidator\Validator:
             tags:
                 - 'app.code_validator'
 
-    Symfony\CodeBlockChecker\:
+    SymfonyTools\CodeBlockChecker\:
         resource: '../src/'
         exclude:
             - '../src/Kernel.php'
             - '../src/Application.php'
 
-    Symfony\CodeBlockChecker\Service\CodeValidator:
+    SymfonyTools\CodeBlockChecker\Service\CodeValidator:
         arguments: [!tagged_iterator app.code_validator]

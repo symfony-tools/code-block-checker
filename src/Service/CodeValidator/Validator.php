@@ -1,9 +1,9 @@
 <?php
 
-namespace Symfony\CodeBlockChecker\Service\CodeValidator;
+namespace SymfonyTools\CodeBlockChecker\Service\CodeValidator;
 
 use Doctrine\RST\Nodes\CodeNode;
-use Symfony\CodeBlockChecker\Issue\IssueCollection;
+use SymfonyTools\CodeBlockChecker\Issue\IssueCollection;
 
 interface Validator
 {

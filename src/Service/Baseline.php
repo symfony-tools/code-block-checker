@@ -1,9 +1,9 @@
 <?php
 
-namespace Symfony\CodeBlockChecker\Service;
+namespace SymfonyTools\CodeBlockChecker\Service;
 
-use Symfony\CodeBlockChecker\Issue\Issue;
-use Symfony\CodeBlockChecker\Issue\IssueCollection;
+use SymfonyTools\CodeBlockChecker\Issue\Issue;
+use SymfonyTools\CodeBlockChecker\Issue\IssueCollection;
 
 /**
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>

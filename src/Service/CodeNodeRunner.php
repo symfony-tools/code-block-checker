@@ -1,12 +1,12 @@
 <?php
 
-namespace Symfony\CodeBlockChecker\Service;
+namespace SymfonyTools\CodeBlockChecker\Service;
 
 use Doctrine\RST\Nodes\CodeNode;
-use Symfony\CodeBlockChecker\Issue\Issue;
-use Symfony\CodeBlockChecker\Issue\IssueCollection;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
+use SymfonyTools\CodeBlockChecker\Issue\Issue;
+use SymfonyTools\CodeBlockChecker\Issue\IssueCollection;
 
 /**
  * Runs code nodes in a real application.
