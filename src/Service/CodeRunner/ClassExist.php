@@ -1,10 +1,10 @@
 <?php
 
-namespace Symfony\CodeBlockChecker\Service\CodeRunner;
+namespace SymfonyTools\CodeBlockChecker\Service\CodeRunner;
 
 use Doctrine\RST\Nodes\CodeNode;
-use Symfony\CodeBlockChecker\Issue\Issue;
-use Symfony\CodeBlockChecker\Issue\IssueCollection;
+use SymfonyTools\CodeBlockChecker\Issue\Issue;
+use SymfonyTools\CodeBlockChecker\Issue\IssueCollection;
 use Symfony\Component\Process\Process;
 
 /**

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Symfony\CodeBlockChecker\Service;
+namespace SymfonyTools\CodeBlockChecker\Service;
 
 use Doctrine\RST\Nodes\CodeNode;
-use Symfony\CodeBlockChecker\Issue\IssueCollection;
-use Symfony\CodeBlockChecker\Service\CodeRunner\Runner;
+use SymfonyTools\CodeBlockChecker\Issue\IssueCollection;
+use SymfonyTools\CodeBlockChecker\Service\CodeRunner\Runner;
 
 /**
  * Run a Code Node inside a real application.

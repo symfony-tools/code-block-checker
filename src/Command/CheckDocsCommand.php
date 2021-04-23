@@ -22,7 +22,7 @@ use SymfonyDocsBuilder\BuildConfig;
 use SymfonyTools\CodeBlockChecker\Issue\IssueCollection;
 use SymfonyTools\CodeBlockChecker\Listener\CodeNodeCollector;
 use SymfonyTools\CodeBlockChecker\Service\Baseline;
-use SymfonyTools\CodeBlockChecker\Service\CodeNodeRunner;
+use SymfonyTools\CodeBlockChecker\Service\CodeRunner;
 use SymfonyTools\CodeBlockChecker\Service\CodeValidator;
 
 class CheckDocsCommand extends Command

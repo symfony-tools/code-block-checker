@@ -23,5 +23,5 @@ services:
     SymfonyTools\CodeBlockChecker\Service\CodeValidator:
         arguments: [!tagged_iterator app.code_validator]
 
-    Symfony\CodeBlockChecker\Service\CodeRunner:
+    SymfonyTools\CodeBlockChecker\Service\CodeRunner:
         arguments: [!tagged_iterator app.code_runner]
