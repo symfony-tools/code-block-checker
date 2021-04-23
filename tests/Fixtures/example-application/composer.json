@@ -1,0 +1,11 @@
+{
+    "name": "example/app",
+    "type": "project",
+    "license": "MIT",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Example\\App\\": "src/"
+        }
+    }
+}
