@@ -8,6 +8,7 @@
         "ext-iconv": "*",
         "ext-libxml": "*",
         "doctrine/rst-parser": "^0.4",
+        "nikic/php-parser": "^4.10",
         "symfony/console": "^5.2",
         "symfony/docs-builder": "^0.15.0",
         "symfony/dotenv": "^5.2",
