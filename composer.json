@@ -9,8 +9,8 @@
         "ext-libxml": "*",
         "doctrine/rst-parser": "^0.4",
         "nikic/php-parser": "^4.10",
+        "symfony-tools/docs-builder": "^0.15.0",
         "symfony/console": "^5.2",
-        "symfony/docs-builder": "^0.15.0",
         "symfony/dotenv": "^5.2",
         "symfony/event-dispatcher": "^5.2",
         "symfony/filesystem": "^5.2",
@@ -51,12 +51,6 @@
             "SymfonyTools\\CodeBlockChecker\\Tests\\": "tests/"
         }
     },
-    "repositories": [
-        {
-            "type": "git",
-            "url": "https://github.com/symfony-tools/docs-builder"
-        }
-    ],
     "minimum-stability": "dev",
     "prefer-stable": true
 }

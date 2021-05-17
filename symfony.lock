@@ -127,6 +127,9 @@
     "sebastian/version": {
         "version": "3.0.2"
     },
+    "symfony-tools/docs-builder": {
+        "version": "v0.15.0"
+    },
     "symfony/cache": {
         "version": "v5.2.6"
     },
@@ -156,9 +159,6 @@
     },
     "symfony/deprecation-contracts": {
         "version": "v2.2.0"
-    },
-    "symfony/docs-builder": {
-        "version": "v0.15.0"
     },
     "symfony/dom-crawler": {
         "version": "v5.2.4"
