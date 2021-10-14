@@ -61,6 +61,7 @@ class DummyExtension extends AbstractExtension
             new TwigFunction('impersonation_exit_url'),
             new TwigFunction('workflow_transition'),
             new TwigFunction('t'),
+            new TwigFunction('mercure'),
         ];
     }
 
