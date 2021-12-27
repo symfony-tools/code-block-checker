@@ -62,6 +62,9 @@ class DummyExtension extends AbstractExtension
             new TwigFunction('workflow_transition'),
             new TwigFunction('t'),
             new TwigFunction('mercure'),
+            new TwigFunction('stimulus_controller'),
+            new TwigFunction('stimulus_action'),
+            new TwigFunction('stimulus_target'),
         ];
     }
 
