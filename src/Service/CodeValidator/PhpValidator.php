@@ -41,8 +41,13 @@ class PhpValidator implements Validator
     private function getContents(CodeNode $node, &$linesPrepended = null): string
     {
         $contents = $node->getValue();
-        if (!preg_match('#(class|interface) [a-zA-Z]+#s', $contents) && preg_match('#(public|protected|private)( static)? (\$[a-z]+|function)#s', $contents)) {
-            $contents = 'class Foobar {'.$contents.'}';
+        if (
+            !preg_match('#(class|interface) [a-zA-Z]+#s', $contents)
+            && !preg_match('#= new class#s', $contents)
+            && preg_match('#(public|protected|private)( static)? (\$[a-z]+|function).*#s', $contents, $matches)
+        ) {
+            // keep "uses" and other code before the class definition
+            $contents = substr($contents, 0, strpos($contents, $matches[1])).PHP_EOL.'class Foobar {'.$matches[0].'}';
         }
 
         // Allow us to use "..." as a placeholder
