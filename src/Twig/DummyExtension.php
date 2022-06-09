@@ -2,9 +2,15 @@
 
 namespace SymfonyTools\CodeBlockChecker\Twig;
 
+use Symfony\Bridge\Twig\TokenParser\DumpTokenParser;
+use Symfony\Bridge\Twig\TokenParser\FormThemeTokenParser;
+use Symfony\Bridge\Twig\TokenParser\StopwatchTokenParser;
+use Symfony\Bridge\Twig\TokenParser\TransDefaultDomainTokenParser;
+use Symfony\Bridge\Twig\TokenParser\TransTokenParser;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
+use Twig\TwigTest;
 
 /**
  * This extension will contain filters and functions that exists in Symfony. This
@@ -91,6 +97,27 @@ class DummyExtension extends AbstractExtension
             new TwigFilter('markdown_to_html'),
             new TwigFilter('inky_to_html'),
             new TwigFilter('serialize'),
+            new TwigFilter('price'),
+            new TwigFilter('greet'),
+        ];
+    }
+
+    public function getTests()
+    {
+        return [
+            new TwigTest('rootform'),
+            new TwigTest('selectedchoice'),
+        ];
+    }
+
+    public function getTokenParsers()
+    {
+        return [
+            new DumpTokenParser(),
+            new FormThemeTokenParser(),
+            new StopwatchTokenParser(false),
+            new TransTokenParser(),
+            new TransDefaultDomainTokenParser(),
         ];
     }
 }
