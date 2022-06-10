@@ -13,7 +13,7 @@ use SymfonyTools\CodeBlockChecker\Issue\IssueCollection;
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class ConfigurationRunner
+class ConfigurationRunner implements Runner
 {
     /**
      * @param list<CodeNode> $nodes
@@ -77,7 +77,7 @@ class ConfigurationRunner
         $regex = match ($node->getLanguage()) {
             'php' => '|^// ?([a-z1-9A-Z_\-/]+\.php)$|',
             'yaml' => '|^# ?([a-z1-9A-Z_\-/]+\.yaml)$|',
-            //'xml' => '|^<!-- ?([a-z1-9A-Z_\-/]+\.xml) ?-->$|',
+            'xml' => '|^<!-- ?([a-z1-9A-Z_\-/]+\.xml) ?-->$|',
             default => null,
         };
 
