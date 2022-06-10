@@ -20,5 +20,5 @@ $ php ./code-block-checker.php verify:docs /path/to/docs cache.rst controller.rs
 This project is considered **an internal tool** and therefore, you
 **shouldn't use this project in your application**. Unlike the rest of the
 Symfony projects, this repository doesn't provide any support and it doesn't
-guarantee backward compatibility either. Any or the entire project can change,
+guarantee backward compatibility. Any file or the entire project can change,
 or even disappear, at any moment without prior notice.
