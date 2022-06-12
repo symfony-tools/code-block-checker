@@ -25,7 +25,7 @@ class IssueCollection implements \Iterator, \Countable
         ++$this->key;
     }
 
-    public function key(): mixed
+    public function key(): int
     {
         return $this->key;
     }
