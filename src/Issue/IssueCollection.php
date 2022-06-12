@@ -15,7 +15,7 @@ class IssueCollection implements \Iterator, \Countable
         $this->issues[] = $issue;
     }
 
-    public function current(): mixed
+    public function current(): Issue
     {
         return $this->issues[$this->key];
     }
