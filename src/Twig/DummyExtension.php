@@ -71,6 +71,12 @@ class DummyExtension extends AbstractExtension
             new TwigFunction('stimulus_controller'),
             new TwigFunction('stimulus_action'),
             new TwigFunction('stimulus_target'),
+            new TwigFunction('field_name'),
+            new TwigFunction('field_value'),
+            new TwigFunction('field_label'),
+            new TwigFunction('field_help'),
+            new TwigFunction('field_errors'),
+            new TwigFunction('field_choices'),
         ];
     }
 
