@@ -19,7 +19,7 @@ class YamlValidator implements Validator
         // Allow us to use "..." as a placeholder
         $contents = str_replace('...', 'null', $node->getValue());
         try {
-            Yaml::parse($contents, Yaml::PARSE_CUSTOM_TAGS);
+            Yaml::parse($contents, Yaml::PARSE_CONSTANT | Yaml::PARSE_CUSTOM_TAGS);
         } catch (ParseException $e) {
             if ('Duplicate key' === substr($e->getMessage(), 0, 13)) {
                 return;
