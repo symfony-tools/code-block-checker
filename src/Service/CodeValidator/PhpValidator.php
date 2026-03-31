@@ -32,7 +32,7 @@ class PhpValidator implements Validator
     private function getParser(): Parser
     {
         if (null === $this->parser) {
-            $this->parser = (new ParserFactory())->create(ParserFactory::ONLY_PHP7);
+            $this->parser = (new ParserFactory())->createForNewestSupportedVersion();
         }
 
         return $this->parser;

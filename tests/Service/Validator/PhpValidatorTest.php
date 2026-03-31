@@ -5,6 +5,7 @@ namespace SymfonyTools\CodeBlockChecker\Tests\Service\Validator;
 use Doctrine\RST\Configuration;
 use Doctrine\RST\Environment;
 use Doctrine\RST\Nodes\CodeNode;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use SymfonyTools\CodeBlockChecker\Issue\IssueCollection;
 use SymfonyTools\CodeBlockChecker\Service\CodeValidator\PhpValidator;
@@ -53,9 +54,7 @@ echo "foo";
         $this->assertEquals(5, $issues->first()->getLocalLine());
     }
 
-    /**
-     * @dataProvider getCodeExamples
-     */
+    #[DataProvider('getCodeExamples')]
     public function testCodeExamples(int $errors, string $code, ?string $language = null)
     {
         $node = new CodeNode(explode(PHP_EOL, $code));
@@ -65,7 +64,7 @@ echo "foo";
         $this->assertCount($errors, $issues);
     }
 
-    public function getCodeExamples(): iterable
+    public static function getCodeExamples(): iterable
     {
         yield [0, '
 namespace Symfony\Component\HttpKernel;
