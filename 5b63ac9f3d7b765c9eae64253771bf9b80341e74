@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by stof at 2026-07-29T10:36:26Z
+
+should this be conditional based on the target Symfony version ?
+
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-07-29T14:19:27Z
+
+Good question! As it stands, the Twig validator has no notion of a target Symfony version: `TwigValidator` registers `DummyExtension` unconditionally, and the whitelist has always mixed functions from very different eras (`dns_prefetch` is 7.3+, `impersonation_exit_path` goes back to 5.x, and they sit next to each other). The `--symfony-application` option only feeds the PHP-side validators.
+
+So this PR follows the existing contract: the dummy extension exists to avoid false "unknown function" errors when linting docs that legitimately document these functions, not to assert availability in a given version. The versioned docs themselves are what keeps a 6.4 page from using a 7.3 function, with human review as the backstop.
+
+Making it conditional would need two new pieces: a way to tell the checker the target version (new option, or deriving it from the checked branch) and a per-function version map in the extension. That would make the linter catch "too new for this branch" mistakes, which is a real plus, but it is a standalone feature touching every entry of the whitelist rather than these six. Happy to give it a try in a follow-up PR if you think it is worth having!
