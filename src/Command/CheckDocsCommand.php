@@ -10,6 +10,7 @@ use Doctrine\RST\Builder\ParseQueueProcessor;
 use Doctrine\RST\ErrorManager;
 use Doctrine\RST\Event\PostNodeCreateEvent;
 use Doctrine\RST\Meta\Metas;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -25,10 +26,9 @@ use SymfonyTools\CodeBlockChecker\Service\Baseline;
 use SymfonyTools\CodeBlockChecker\Service\CodeRunner;
 use SymfonyTools\CodeBlockChecker\Service\CodeValidator;
 
+#[AsCommand(name: 'verify:docs')]
 class CheckDocsCommand extends Command
 {
-    protected static $defaultName = 'verify:docs';
-
     private SymfonyStyle $io;
     private ParseQueueProcessor $queueProcessor;
     private CodeNodeCollector $collector;
@@ -38,7 +38,7 @@ class CheckDocsCommand extends Command
 
     public function __construct(CodeValidator $validator, Baseline $baseline, CodeRunner $codeRunner)
     {
-        parent::__construct(self::$defaultName);
+        parent::__construct();
         $this->validator = $validator;
         $this->baseline = $baseline;
         $this->codeRunner = $codeRunner;
