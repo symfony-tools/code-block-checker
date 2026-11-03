@@ -2,20 +2,21 @@
 
 namespace SymfonyTools\CodeBlockChecker\Service\CodeValidator;
 
-use Doctrine\RST\Nodes\CodeNode;
 use SymfonyTools\CodeBlockChecker\Issue\Issue;
 use SymfonyTools\CodeBlockChecker\Issue\IssueCollection;
+use SymfonyTools\CodeBlockChecker\Listener\DetailedCodeNode;
 
 class XmlValidator implements Validator
 {
-    public function validate(CodeNode $node, IssueCollection $issues): void
+    public function validate(DetailedCodeNode $node, IssueCollection $issues): void
     {
-        if ('xml' !== $node->getLanguage()) {
+        $codeNode = $node->codeNode;
+        if ('xml' !== $codeNode->getLanguage()) {
             return;
         }
 
         $count = 0;
-        $xml = trim(preg_replace('#^<!-- .* -->\n#', '', $node->getValue(), -1, $count));
+        $xml = trim(preg_replace('#^<!-- .* -->\n#', '', $codeNode->getValue(), -1, $count));
         if ('' === $xml) {
             return;
         }
@@ -49,7 +50,7 @@ class XmlValidator implements Validator
         }
 
         if (null !== $error) {
-            $issues->addIssue(new Issue($node, $error->message, 'XML syntax', $node->getEnvironment()->getCurrentFileName(), $error->line + $count));
+            $issues->addIssue(new Issue($codeNode, $error->message, 'XML syntax', $node->fileName, $error->line + $count));
         }
     }
 }

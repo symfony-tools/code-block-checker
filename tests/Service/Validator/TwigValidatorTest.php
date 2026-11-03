@@ -2,30 +2,25 @@
 
 namespace SymfonyTools\CodeBlockChecker\Tests\Service\Validator;
 
-use Doctrine\RST\Configuration;
-use Doctrine\RST\Environment;
-use Doctrine\RST\Nodes\CodeNode;
+use phpDocumentor\Guides\Nodes\CodeNode;
 use PHPUnit\Framework\TestCase;
 use SymfonyTools\CodeBlockChecker\Issue\IssueCollection;
+use SymfonyTools\CodeBlockChecker\Listener\DetailedCodeNode;
 use SymfonyTools\CodeBlockChecker\Service\CodeValidator\TwigValidator;
 use SymfonyTools\CodeBlockChecker\Service\CodeValidator\Validator;
 
 class TwigValidatorTest extends TestCase
 {
     private Validator $validator;
-    private Environment $environment;
 
     protected function setUp(): void
     {
         $this->validator = new TwigValidator();
-        $this->environment = new Environment(new Configuration());
     }
 
     public function testParseTwig()
     {
-        $node = new CodeNode(['{{ form(form) }}']);
-        $node->setEnvironment($this->environment);
-        $node->setLanguage('twig');
+        $node = new DetailedCodeNode(new CodeNode(['{{ form(form) }}'], 'twig'), []);
         $issues = new IssueCollection();
         $this->validator->validate($node, $issues);
         $this->assertCount(0, $issues);
@@ -33,7 +28,7 @@ class TwigValidatorTest extends TestCase
 
     public function testParseSecurityFunctions()
     {
-        $node = new CodeNode([
+        $node = new DetailedCodeNode(new CodeNode([
             '{{ is_granted("ROLE_ADMIN") }}',
             '{{ is_granted_for_user(user, "ROLE_ADMIN") }}',
             '{{ access_decision("ROLE_ADMIN").isGranted }}',
@@ -42,9 +37,7 @@ class TwigValidatorTest extends TestCase
             '{{ impersonation_url("_exit") }}',
             '{{ impersonation_exit_path() }}',
             '{{ impersonation_exit_url() }}',
-        ]);
-        $node->setEnvironment($this->environment);
-        $node->setLanguage('twig');
+        ], 'twig'), []);
         $issues = new IssueCollection();
         $this->validator->validate($node, $issues);
         $this->assertCount(0, $issues);

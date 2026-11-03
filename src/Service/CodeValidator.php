@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace SymfonyTools\CodeBlockChecker\Service;
 
-use Doctrine\RST\Nodes\CodeNode;
 use SymfonyTools\CodeBlockChecker\Issue\IssueCollection;
+use SymfonyTools\CodeBlockChecker\Listener\DetailedCodeNode;
 use SymfonyTools\CodeBlockChecker\Service\CodeValidator\Validator;
 
 /**
@@ -29,7 +29,7 @@ class CodeValidator
     }
 
     /**
-     * @param list<CodeNode> $nodes
+     * @param list<DetailedCodeNode> $nodes
      */
     public function validateNodes(array $nodes): IssueCollection
     {

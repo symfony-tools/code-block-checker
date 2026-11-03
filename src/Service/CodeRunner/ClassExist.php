@@ -2,10 +2,10 @@
 
 namespace SymfonyTools\CodeBlockChecker\Service\CodeRunner;
 
-use Doctrine\RST\Nodes\CodeNode;
 use Symfony\Component\Process\Process;
 use SymfonyTools\CodeBlockChecker\Issue\Issue;
 use SymfonyTools\CodeBlockChecker\Issue\IssueCollection;
+use SymfonyTools\CodeBlockChecker\Listener\DetailedCodeNode;
 
 /**
  * Verify that any reference to a PHP class is actually a real class.
@@ -15,7 +15,7 @@ use SymfonyTools\CodeBlockChecker\Issue\IssueCollection;
 class ClassExist implements Runner
 {
     /**
-     * @param list<CodeNode> $nodes
+     * @param list<DetailedCodeNode> $nodes
      */
     public function run(array $nodes, IssueCollection $issues, string $applicationDirectory): void
     {
@@ -27,15 +27,16 @@ class ClassExist implements Runner
         $this->testClasses($classes, $issues, $applicationDirectory);
     }
 
-    private function getClasses(CodeNode $node): array
+    private function getClasses(DetailedCodeNode $node): array
     {
-        $language = $node->getLanguage() ?? 'php';
+        $codeNode = $node->codeNode;
+        $language = $codeNode->getLanguage() ?? 'php';
         if (!in_array($language, ['php', 'php-symfony', 'php-standalone', 'php-annotations'])) {
             return [];
         }
 
         $classes = [];
-        foreach (explode("\n", $node->getValue()) as $i => $line) {
+        foreach (explode("\n", $codeNode->getValue()) as $i => $line) {
             $matches = [];
             if (0 !== strpos($line, 'use ') || !preg_match('|^use (.*\\\.*); *?$|m', $line, $matches)) {
                 continue;
@@ -67,7 +68,7 @@ class ClassExist implements Runner
     /**
      * Make sure PHP classes exists in the application directory.
      *
-     * @param array{int, array{ class: string, line: int, node: CodeNode } } $classes
+     * @param array{int, array{ class: string, line: int, node: DetailedCodeNode } } $classes
      */
     private function testClasses(array $classes, IssueCollection $issues, string $applicationDirectory): void
     {
@@ -106,7 +107,7 @@ echo json_encode([ARRAY_CONTENT]);
         foreach ($classes as $i => $data) {
             if (!$results[$i]) {
                 $text = sprintf('Class, interface or trait with name "%s" does not exist', $data['class']);
-                $issues->addIssue(new Issue($data['node'], $text, 'Missing class', $data['node']->getEnvironment()->getCurrentFileName(), $data['line']));
+                $issues->addIssue(new Issue($data['node']->codeNode, $text, 'Missing class', $data['node']->fileName, $data['line']));
             }
         }
     }

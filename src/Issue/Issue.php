@@ -2,7 +2,7 @@
 
 namespace SymfonyTools\CodeBlockChecker\Issue;
 
-use Doctrine\RST\Nodes\CodeNode;
+use phpDocumentor\Guides\Nodes\CodeNode;
 use SymfonyTools\CodeBlockChecker\Service\LineDetector;
 
 /**
@@ -56,13 +56,13 @@ class Issue implements \Stringable
 
     public function getFile(): string
     {
-        return $this->file.'.rst';
+        return $this->file;
     }
 
     public function getLine(): int
     {
         if (null === $this->line) {
-            $offset = LineDetector::find($this->node);
+            $offset = LineDetector::find($this->node, $this->file);
             $this->line = $offset + $this->localLine;
         }
 

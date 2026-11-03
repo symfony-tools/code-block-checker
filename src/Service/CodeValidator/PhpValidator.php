@@ -2,30 +2,32 @@
 
 namespace SymfonyTools\CodeBlockChecker\Service\CodeValidator;
 
-use Doctrine\RST\Nodes\CodeNode;
+use phpDocumentor\Guides\Nodes\CodeNode;
 use PhpParser\ErrorHandler;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
 use SymfonyTools\CodeBlockChecker\Issue\Issue;
 use SymfonyTools\CodeBlockChecker\Issue\IssueCollection;
+use SymfonyTools\CodeBlockChecker\Listener\DetailedCodeNode;
 
 class PhpValidator implements Validator
 {
     private ?Parser $parser = null;
 
-    public function validate(CodeNode $node, IssueCollection $issues): void
+    public function validate(DetailedCodeNode $node, IssueCollection $issues): void
     {
-        $language = $node->getLanguage() ?? ($node->isRaw() ? null : 'php');
+        $codeNode = $node->codeNode;
+        $language = $codeNode->getLanguage() ?? 'php';
         if (!in_array($language, ['php', 'php-symfony', 'php-standalone', 'php-annotations', 'html+php'])) {
             return;
         }
 
         $linesPrepended = 0;
-        $code = 'html+php' === $language ? $node->getValue() : $this->getContents($node, $linesPrepended);
+        $code = 'html+php' === $language ? $codeNode->getValue() : $this->getContents($codeNode, $linesPrepended);
         $this->getParser()->parse($code, $errorHandler = new ErrorHandler\Collecting());
 
         foreach ($errorHandler->getErrors() as $error) {
-            $issues->addIssue(new Issue($node, $error->getRawMessage(), 'PHP syntax', $node->getEnvironment()->getCurrentFileName(), $error->getStartLine() - $linesPrepended));
+            $issues->addIssue(new Issue($codeNode, $error->getRawMessage(), 'PHP syntax', $node->fileName, $error->getStartLine() - $linesPrepended));
         }
     }
 

@@ -2,7 +2,7 @@
 
 namespace SymfonyTools\CodeBlockChecker\Service;
 
-use Doctrine\RST\Nodes\CodeNode;
+use phpDocumentor\Guides\Nodes\CodeNode;
 
 /**
  * Find the line a CodeNode belongs to.
@@ -14,15 +14,13 @@ class LineDetector
     /**
      * Get the line number where the $node starts.
      */
-    public static function find(CodeNode $node): int
+    public static function find(CodeNode $node, string $fileName): int
     {
-        $environment = $node->getEnvironment();
-        if ('' === $environment->getCurrentFileName()) {
+        if ('' === $fileName) {
             return 0;
         }
 
-        $file = sprintf('%s/%s.rst', $environment->getCurrentDirectory(), $environment->getCurrentFileName());
-        $contents = explode("\n", file_get_contents($file));
+        $contents = explode("\n", file_get_contents($fileName));
         $codeBlock = explode("\n", $node->getValue());
 
         foreach ($contents as $i => $line) {
