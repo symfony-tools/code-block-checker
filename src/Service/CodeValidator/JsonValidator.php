@@ -2,22 +2,23 @@
 
 namespace SymfonyTools\CodeBlockChecker\Service\CodeValidator;
 
-use Doctrine\RST\Nodes\CodeNode;
 use SymfonyTools\CodeBlockChecker\Issue\Issue;
 use SymfonyTools\CodeBlockChecker\Issue\IssueCollection;
+use SymfonyTools\CodeBlockChecker\Listener\DetailedCodeNode;
 
 class JsonValidator implements Validator
 {
-    public function validate(CodeNode $node, IssueCollection $issues): void
+    public function validate(DetailedCodeNode $node, IssueCollection $issues): void
     {
-        if ('json' !== $node->getLanguage()) {
+        $codeNode = $node->codeNode;
+        if ('json' !== $codeNode->getLanguage()) {
             return;
         }
 
         try {
-            $data = json_decode($node->getValue(), true, 512, JSON_THROW_ON_ERROR);
+            $data = json_decode($codeNode->getValue(), true, 512, JSON_THROW_ON_ERROR);
         } catch (\JsonException $e) {
-            $issues->addIssue(new Issue($node, $e->getMessage(), 'JSON syntax', $node->getEnvironment()->getCurrentFileName(), 0));
+            $issues->addIssue(new Issue($codeNode, $e->getMessage(), 'JSON syntax', $node->fileName, 0));
         }
     }
 }

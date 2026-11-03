@@ -2,11 +2,12 @@
 
 namespace SymfonyTools\CodeBlockChecker\Service\CodeRunner;
 
-use Doctrine\RST\Nodes\CodeNode;
+use phpDocumentor\Guides\Nodes\CodeNode;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
 use SymfonyTools\CodeBlockChecker\Issue\Issue;
 use SymfonyTools\CodeBlockChecker\Issue\IssueCollection;
+use SymfonyTools\CodeBlockChecker\Listener\DetailedCodeNode;
 
 /**
  * Runs code nodes in a real application.
@@ -16,7 +17,7 @@ use SymfonyTools\CodeBlockChecker\Issue\IssueCollection;
 class ConfigurationRunner implements Runner
 {
     /**
-     * @param list<CodeNode> $nodes
+     * @param list<DetailedCodeNode> $nodes
      */
     public function run(array $nodes, IssueCollection $issues, string $applicationDirectory): void
     {
@@ -25,10 +26,11 @@ class ConfigurationRunner implements Runner
         }
     }
 
-    private function processNode(CodeNode $node, IssueCollection $issues, string $applicationDirectory): void
+    private function processNode(DetailedCodeNode $node, IssueCollection $issues, string $applicationDirectory): void
     {
-        $explodedNode = explode("\n", $node->getValue());
-        $file = $this->getFile($node, $explodedNode);
+        $codeNode = $node->codeNode;
+        $explodedNode = explode("\n", $codeNode->getValue());
+        $file = $this->getFile($codeNode, $explodedNode);
 
         if ('config/packages/' !== substr($file, 0, 16)) {
             return;
@@ -44,7 +46,7 @@ class ConfigurationRunner implements Runner
             }
 
             // Write config
-            file_put_contents($fullPath, $this->getNodeContents($node, $explodedNode));
+            file_put_contents($fullPath, $this->getNodeContents($codeNode, $explodedNode));
 
             // Clear cache
             $filesystem->remove($applicationDirectory.'/var/cache');
@@ -61,7 +63,7 @@ class ConfigurationRunner implements Runner
         }
     }
 
-    private function warmupCache(CodeNode $node, IssueCollection $issues, string $applicationDirectory, int $numberOfLines): void
+    private function warmupCache(DetailedCodeNode $node, IssueCollection $issues, string $applicationDirectory, int $numberOfLines): void
     {
         $process = new Process(['php', 'bin/console', 'cache:warmup', '--env', 'dev'], $applicationDirectory);
         $process->run();
@@ -69,7 +71,7 @@ class ConfigurationRunner implements Runner
             return;
         }
 
-        $issues->addIssue(new Issue($node, trim($process->getErrorOutput()), 'Cache Warmup', $node->getEnvironment()->getCurrentFileName(), $numberOfLines));
+        $issues->addIssue(new Issue($node->codeNode, trim($process->getErrorOutput()), 'Cache Warmup', $node->fileName, $numberOfLines));
     }
 
     private function getFile(CodeNode $node, array $contents): string

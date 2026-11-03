@@ -2,21 +2,18 @@
 
 namespace SymfonyTools\CodeBlockChecker\Tests\Service\CodeRunner;
 
-use Doctrine\RST\Configuration;
-use Doctrine\RST\Environment;
-use Doctrine\RST\Nodes\CodeNode;
+use phpDocumentor\Guides\Nodes\CodeNode;
 use SymfonyTools\CodeBlockChecker\Issue\IssueCollection;
+use SymfonyTools\CodeBlockChecker\Listener\DetailedCodeNode;
 use SymfonyTools\CodeBlockChecker\Service\CodeRunner\ClassExist;
 use SymfonyTools\CodeBlockChecker\Service\CodeRunner\Runner;
 
 class ClassExistTest extends BaseCodeRunnerTest
 {
     private Runner $runner;
-    private Environment $environment;
 
     protected function setUp(): void
     {
-        $this->environment = new Environment(new Configuration());
         $this->runner = new ClassExist();
     }
 
@@ -29,9 +26,7 @@ use Foo\Bar\Baz;
 
 echo "hello";
 ';
-        $node = new CodeNode(explode(PHP_EOL, $code));
-        $node->setEnvironment($this->environment);
-        $node->setLanguage('php');
+        $node = new DetailedCodeNode(new CodeNode(explode(PHP_EOL, $code), 'php'), []);
         $issues = new IssueCollection();
         $this->runner->run([$node], $issues, $this->getApplicationDirectory());
         $this->assertCount(1, $issues);

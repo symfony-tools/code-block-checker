@@ -2,23 +2,20 @@
 
 namespace SymfonyTools\CodeBlockChecker\Tests\Service\Validator;
 
-use Doctrine\RST\Configuration;
-use Doctrine\RST\Environment;
-use Doctrine\RST\Nodes\CodeNode;
+use phpDocumentor\Guides\Nodes\CodeNode;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use SymfonyTools\CodeBlockChecker\Issue\IssueCollection;
+use SymfonyTools\CodeBlockChecker\Listener\DetailedCodeNode;
 use SymfonyTools\CodeBlockChecker\Service\CodeValidator\PhpValidator;
 use SymfonyTools\CodeBlockChecker\Service\CodeValidator\Validator;
 
 class PhpValidatorTest extends TestCase
 {
     private Validator $validator;
-    private Environment $environment;
 
     protected function setUp(): void
     {
-        $this->environment = new Environment(new Configuration());
         $this->validator = new PhpValidator();
     }
 
@@ -31,9 +28,7 @@ $z = 4
 echo "foo";
 ';
 
-        $node = new CodeNode(explode(PHP_EOL, $code));
-        $node->setEnvironment($this->environment);
-        $node->setLanguage('php');
+        $node = new DetailedCodeNode(new CodeNode(explode(PHP_EOL, $code), 'php'), []);
         $this->validator->validate($node, $issues = new IssueCollection());
         $this->assertCount(1, $issues);
         $this->assertEquals(4, $issues->first()->getLocalLine());
@@ -46,9 +41,7 @@ $z = 4
 echo "foo";
 ';
 
-        $node = new CodeNode(explode(PHP_EOL, $code));
-        $node->setEnvironment($this->environment);
-        $node->setLanguage('php');
+        $node = new DetailedCodeNode(new CodeNode(explode(PHP_EOL, $code), 'php'), []);
         $this->validator->validate($node, $issues = new IssueCollection());
         $this->assertCount(1, $issues);
         $this->assertEquals(5, $issues->first()->getLocalLine());
@@ -57,9 +50,7 @@ echo "foo";
     #[DataProvider('getCodeExamples')]
     public function testCodeExamples(int $errors, string $code, ?string $language = null)
     {
-        $node = new CodeNode(explode(PHP_EOL, $code));
-        $node->setEnvironment($this->environment);
-        $node->setLanguage($language ?? 'php');
+        $node = new DetailedCodeNode(new CodeNode(explode(PHP_EOL, $code), $language ?? 'php'), []);
         $this->validator->validate($node, $issues = new IssueCollection());
         $this->assertCount($errors, $issues);
     }

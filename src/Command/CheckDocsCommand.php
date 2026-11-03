@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace SymfonyTools\CodeBlockChecker\Command;
 
-use Doctrine\RST\Builder\Documents;
-use Doctrine\RST\Builder\ParseQueue;
-use Doctrine\RST\Builder\ParseQueueProcessor;
-use Doctrine\RST\ErrorManager;
-use Doctrine\RST\Event\PostNodeCreateEvent;
-use Doctrine\RST\Meta\Metas;
+use League\Flysystem\Filesystem as LeagueFilesystem;
+use League\Flysystem\Local\LocalFilesystemAdapter;
+use League\Tactician\CommandBus;
+use phpDocumentor\FileSystem\FlysystemV3\FlysystemV3;
+use phpDocumentor\Guides\Compiler\CompilerContext;
+use phpDocumentor\Guides\Handlers\CompileDocumentsCommand;
+use phpDocumentor\Guides\Handlers\ParseDirectoryCommand;
+use phpDocumentor\Guides\Handlers\ParseFileCommand;
+use phpDocumentor\Guides\Nodes\ProjectNode;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -17,24 +20,25 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Finder\Finder;
-use SymfonyDocsBuilder\BuildConfig;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use SymfonyTools\CodeBlockChecker\Issue\IssueCollection;
 use SymfonyTools\CodeBlockChecker\Listener\CodeNodeCollector;
 use SymfonyTools\CodeBlockChecker\Service\Baseline;
 use SymfonyTools\CodeBlockChecker\Service\CodeRunner;
 use SymfonyTools\CodeBlockChecker\Service\CodeValidator;
+use SymfonyTools\DocsBuilder\GuidesExtension\DocsKernel;
 
 #[AsCommand(name: 'verify:docs')]
 class CheckDocsCommand extends Command
 {
     private SymfonyStyle $io;
-    private ParseQueueProcessor $queueProcessor;
     private CodeNodeCollector $collector;
     private CodeValidator $validator;
     private Baseline $baseline;
     private CodeRunner $codeRunner;
+    private DocsKernel $docsKernel;
 
     public function __construct(CodeValidator $validator, Baseline $baseline, CodeRunner $codeRunner)
     {
@@ -65,25 +69,60 @@ class CheckDocsCommand extends Command
         if (!file_exists($sourceDir)) {
             throw new \InvalidArgumentException(sprintf('RST source directory "%s" does not exist', $sourceDir));
         }
-        $buildConfig = new BuildConfig();
-        $buildConfig->setContentDir($sourceDir);
 
-        $kernel = \SymfonyDocsBuilder\KernelFactory::createKernel($buildConfig);
-        $configuration = $kernel->getConfiguration();
-        $configuration->silentOnError(true);
-        $eventManager = $configuration->getEventManager();
-        $eventManager->addEventListener(PostNodeCreateEvent::POST_NODE_CREATE, $this->collector = new CodeNodeCollector());
+        $this->docsKernel = DocsKernel::create([
+            new class implements ExtensionInterface, CompilerPassInterface {
+                public function load(array $configs, ContainerBuilder $container): void
+                {
+                    $container->register(CodeNodeCollector::class)
+                        ->setPublic(true)
+                        ->addTag('phpdoc.guides.compiler.nodeTransformers');
+                }
 
-        $metas = new Metas();
-        $documents = new Documents(new Filesystem(), $metas);
+                public function process(ContainerBuilder $container): void
+                {
+                    $container->getDefinition(CommandBus::class)->setPublic(true);
+                }
 
-        $this->queueProcessor = new ParseQueueProcessor($kernel, new ErrorManager($configuration), $metas, $documents, $sourceDir, '/foo/target', 'rst');
+                public function getAlias(): string
+                {
+                    return 'code-block-checker';
+                }
+            },
+        ]);
+        $this->collector = $this->docsKernel->get(CodeNodeCollector::class);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         // This will collect all CodeNodes
-        $this->queueProcessor->process($this->prepareParseQueue($input));
+        $sourceDir = new FlysystemV3(new LeagueFilesystem(new LocalFilesystemAdapter($input->getArgument('source-dir'))));
+        $files = $input->getArgument('files');
+        $command = null;
+        $projectNode = new ProjectNode('Symfony', '0.1');
+        $commandBus = $this->docsKernel->get(CommandBus::class);
+        if ([] === $files) {
+            $documents = $commandBus->handle(
+                new ParseDirectoryCommand($sourceDir, '/', 'rst', $projectNode)
+            );
+        } else {
+            $documents = [];
+            foreach ($files as $file) {
+                if (!$sourceDir->has($file)) {
+                    $this->outputNotice($input->getOption('output-format'), sprintf('Skipping "%s" (file does not exist)', $file));
+
+                    continue;
+                }
+
+                $documents[] = $commandBus->handle(
+                    new ParseFileCommand($sourceDir, '/', substr($file, 0, -4), 'rst', 1, $projectNode, true)
+                );
+            }
+        }
+
+        $commandBus->handle(
+            new CompileDocumentsCommand($documents, new CompilerContext($projectNode))
+        );
 
         // Verify code blocks
         $issues = $this->validator->validateNodes($this->collector->getNodes());
@@ -116,47 +155,6 @@ class CheckDocsCommand extends Command
         $this->io->success('Build completed successfully!');
 
         return Command::SUCCESS;
-    }
-
-    private function findFiles(string $directory): array
-    {
-        $files = [];
-        $finder = new Finder();
-        $finder->in($directory)
-            ->name('*.rst');
-        foreach ($finder as $file) {
-            $files[] = $file->getRelativePathname();
-        }
-
-        return $files;
-    }
-
-    private function prepareParseQueue(InputInterface $input): ParseQueue
-    {
-        $sourceDirectory = $input->getArgument('source-dir');
-        $files = $input->getArgument('files');
-        if ([] === $files) {
-            $files = $this->findFiles($sourceDirectory);
-        } else {
-            foreach ($files as $i => $file) {
-                if (!file_exists($sourceDirectory.DIRECTORY_SEPARATOR.$file)) {
-                    unset($files[$i]);
-                    $this->outputNotice($input->getOption('output-format'), sprintf('Skipping "%s" (file does not exist)', $file));
-                }
-            }
-        }
-
-        $parseQueue = new ParseQueue();
-        foreach ($files as $filename) {
-            // Only parse .rst files
-            if ('.rst' === substr($filename, -4)) {
-                // Remove ".rst"
-                $filename = substr($filename, 0, -4);
-                $parseQueue->addFile(ltrim($filename, '/'), true);
-            }
-        }
-
-        return $parseQueue;
     }
 
     private function outputNotice(string $format, string $text): void
